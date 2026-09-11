@@ -40,7 +40,8 @@ public class SaveFeature {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("PNG Files (*.png)", "*.png"),
                 new FileChooser.ExtensionFilter("JPEG Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"),
-                new FileChooser.ExtensionFilter("GIF Files (*.gif)", "*.gif")
+                new FileChooser.ExtensionFilter("GIF Files (*.gif)", "*.gif"),
+                new FileChooser.ExtensionFilter("BMP Files (*.bmp)", "*.bmp" )
         );
 
         File saveFile = fileChooser.showSaveDialog(primaryWindow);

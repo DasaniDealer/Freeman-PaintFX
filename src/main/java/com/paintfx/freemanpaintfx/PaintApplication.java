@@ -50,7 +50,7 @@ public class PaintApplication extends Application {
             fileChooser.setTitle("Select an Image File");
 
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
             );
 
             File imageFile = fileChooser.showOpenDialog(primaryStage);

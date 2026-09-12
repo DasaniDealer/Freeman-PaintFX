@@ -68,7 +68,11 @@ public class SaveFeature {
             }
         }
     }
-    //Set Current File
+    //Get and Set Current File
+    public static File getCurrentFile() {
+        return currentFile;
+    }
+
     public static void setCurrentFile(File file) {
         currentFile = file;
     }

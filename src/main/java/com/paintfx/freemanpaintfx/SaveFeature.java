@@ -35,7 +35,7 @@ public class SaveFeature {
     //Save As Function
     public static void saveAs(Image image, Window primaryWindow) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save");
+        fileChooser.setTitle("Save As");
 
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("PNG Files (*.png)", "*.png"),

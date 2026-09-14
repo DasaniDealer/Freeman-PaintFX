@@ -4,22 +4,16 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.MenuBar;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
 import java.io.File;
 import java.io.IOException;
-
-import static com.paintfx.freemanpaintfx.CanvasFeature.drawLines;
-
 
 public class PaintApplication extends Application {
 
@@ -50,6 +44,39 @@ public class PaintApplication extends Application {
 
         help.getItems().addAll(helpAct);
 
+        //Side Menu
+        VBox sideMenu = new VBox(15); // 15px spacing between items
+        sideMenu.setStyle("-fx-padding: 15; -fx-background-color: #E0E0E0; -fx-pref-width: 160;");
+
+        Label toolsLabel = new Label("Tools");
+        toolsLabel.setStyle("-fx-font-weight: bold;");
+        ToggleButton pencilButton = new ToggleButton("Pencil");
+        ToggleButton eraserButton = new ToggleButton("Eraser");
+
+        ToggleGroup toolGroup = new ToggleGroup();
+        pencilButton.setToggleGroup(toolGroup);
+        eraserButton.setToggleGroup(toolGroup);
+        pencilButton.setSelected(true);
+
+        //Colours
+        Label colorLabel = new Label("Colour");
+        colorLabel.setStyle("-fx-font-weight: bold;");
+        ColorPicker colorPicker = new ColorPicker();
+
+        //Brush Size
+        Label sizeLabel = new Label("Brush Size");
+        sizeLabel.setStyle("-fx-font-weight: bold;");
+        Slider sizeSlider = new Slider(1, 50, 5);
+        sizeSlider.setShowTickLabels(true);
+
+        //Side Menu Placements
+        sideMenu.getChildren().addAll(
+                toolsLabel, pencilButton, eraserButton,
+                colorLabel, colorPicker,
+                sizeLabel, sizeSlider
+        );
+
+
         //Image Create
         ImageView imageView = new ImageView();
 
@@ -64,7 +91,10 @@ public class PaintApplication extends Application {
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvas);
 
+        //Main Layout
         BorderPane root = new BorderPane();
+        root.setTop(menuBar);
+        root.setRight(sideMenu);
         root.setCenter(combineArea);
 
         //Open Image
@@ -95,11 +125,9 @@ public class PaintApplication extends Application {
         //Canvas
         helpAct.setOnAction(event -> CanvasFeature.drawLines(gc));
 
-        //IMPORTANT VBOX
-        VBox vBox = new VBox(menuBar, root, combineArea);
-        Scene scene = new Scene(vBox, 960, 600);
-
         //Showtime
+        Scene scene = new Scene(root, 1150, 650);
+
         primaryStage.setScene(scene);
         primaryStage.show();
 

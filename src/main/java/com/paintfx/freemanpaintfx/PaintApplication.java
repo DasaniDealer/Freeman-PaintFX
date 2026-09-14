@@ -76,7 +76,6 @@ public class PaintApplication extends Application {
                 sizeLabel, sizeSlider
         );
 
-
         //Image Create
         ImageView imageView = new ImageView();
 

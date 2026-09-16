@@ -11,6 +11,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
@@ -47,7 +48,7 @@ public class PaintApplication extends Application {
 
         //Side Menu
         VBox sideMenu = new VBox(15); // 15px spacing between items
-        sideMenu.setStyle("-fx-padding: 15; -fx-background-color: #E0E0E0; -fx-pref-width: 160;");
+        sideMenu.setStyle("-fx-padding: 15; -fx-background-color: #c5c7ca; -fx-pref-width: 160;");
 
         Label toolsLabel = new Label("Tools");
         toolsLabel.setStyle("-fx-font-weight: bold;");
@@ -63,6 +64,7 @@ public class PaintApplication extends Application {
         Label colorLabel = new Label("Colour");
         colorLabel.setStyle("-fx-font-weight: bold;");
         ColorPicker colorPicker = new ColorPicker();
+        colorPicker.setValue(Color.web("#000000"));
 
         //Brush Size
         Label sizeLabel = new Label("Brush Size");
@@ -91,10 +93,14 @@ public class PaintApplication extends Application {
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvas);
 
-        //Observe & Give Brush Int
+        //Give Brush Int & Color Hex
         sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double widthSize = newValue.doubleValue();
-            gc.setLineWidth(widthSize);
+            gc.setLineWidth(newValue.doubleValue());
+        });
+
+        colorPicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            gc.setFill(newValue);
+            gc.setStroke(newValue);
         });
 
         //MAIN LAYOUT

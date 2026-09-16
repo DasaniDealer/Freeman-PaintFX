@@ -7,7 +7,7 @@ public class CanvasFeature {
     static void drawLines(GraphicsContext gc) {
 
         gc.beginPath();
-        gc.moveTo(30.5, 30.5);
+        gc.moveTo(350.5, 30.5);
         gc.lineTo(150.5, 30.5);
         gc.stroke();
     }

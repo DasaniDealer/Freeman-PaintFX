@@ -7,6 +7,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -90,7 +91,13 @@ public class PaintApplication extends Application {
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvas);
 
-        //Main Layout
+        //Observe & Give Brush Int
+        sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            double widthSize = newValue.doubleValue();
+            gc.setLineWidth(widthSize);
+        });
+
+        //MAIN LAYOUT
         BorderPane root = new BorderPane();
         root.setTop(menuBar);
         root.setRight(sideMenu);
@@ -117,12 +124,18 @@ public class PaintApplication extends Application {
         });
 
         //Save Image
-        saveImage.setOnAction(event -> SaveFeature.save(imageView.getImage(), primaryStage));
+        saveImage.setOnAction(event -> {
+            WritableImage combineImage = combineArea.snapshot(null,null);
+            SaveFeature.save(combineImage, primaryStage);
+        });
         //Save As
-        saveAsImage.setOnAction(event -> SaveFeature.saveAs(imageView.getImage(), primaryStage));
+        saveAsImage.setOnAction(event -> {
+                WritableImage combineImage = combineArea.snapshot(null,null);
+                SaveFeature.saveAs(combineImage, primaryStage);
+        });
 
         //Canvas
-        helpAct.setOnAction(event -> CanvasFeature.drawLines(gc));
+        pencilButton.setOnAction(event -> CanvasFeature.drawLines(gc));
 
         //Showtime
         Scene scene = new Scene(root, 1150, 650);

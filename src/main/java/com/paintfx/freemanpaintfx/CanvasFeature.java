@@ -4,8 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class CanvasFeature {
 
-    static void drawLines(GraphicsContext gc) {
-
+    static void drawLine(GraphicsContext gc) {
         gc.beginPath();
         gc.moveTo(350.5, 30.5);
         gc.lineTo(150.5, 30.5);

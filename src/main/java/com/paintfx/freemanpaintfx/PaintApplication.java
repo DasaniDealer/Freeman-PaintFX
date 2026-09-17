@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class PaintApplication extends Application {
+    static boolean isSaved = false;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -125,6 +126,8 @@ public class PaintApplication extends Application {
                 imageView.setImage(image);
 
                 SaveFeature.setCurrentFile(imageFile);
+
+                isSaved = false;
             }
 
         });
@@ -133,15 +136,27 @@ public class PaintApplication extends Application {
         saveImage.setOnAction(event -> {
             WritableImage combineImage = combineArea.snapshot(null,null);
             SaveFeature.save(combineImage, primaryStage);
+            isSaved = true;
         });
         //Save As
         saveAsImage.setOnAction(event -> {
-                WritableImage combineImage = combineArea.snapshot(null,null);
-                SaveFeature.saveAs(combineImage, primaryStage);
+            WritableImage combineImage = combineArea.snapshot(null,null);
+            SaveFeature.saveAs(combineImage, primaryStage);
+            isSaved = true;
         });
 
-        //Canvas
-        pencilButton.setOnAction(event -> CanvasFeature.drawLines(gc));
+        //Draw Line
+        pencilButton.setOnAction(event -> {
+            CanvasFeature.drawLine(gc);
+            isSaved = false;
+        });
+
+        //Close Intercept
+        primaryStage.setOnCloseRequest(event -> {
+            WritableImage combineImage = combineArea.snapshot(null,null);
+
+            CloseInterceptFeature.handleExit(event, combineImage);
+        });
 
         //Showtime
         Scene scene = new Scene(root, 1150, 650);

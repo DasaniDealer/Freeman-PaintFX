@@ -13,6 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
@@ -43,12 +44,12 @@ public class PaintApplication extends Application {
         file.getItems().addAll(openImage, saveImage, saveAsImage);
 
         //Help Submenu
-        MenuItem helpAct = new MenuItem("Help");
+        MenuItem helpAct = new MenuItem("About Paint");
 
         help.getItems().addAll(helpAct);
 
         //Side Menu
-        VBox sideMenu = new VBox(15); // 15px spacing between items
+        VBox sideMenu = new VBox(15);
         sideMenu.setStyle("-fx-padding: 15; -fx-background-color: #c5c7ca; -fx-pref-width: 160;");
 
         Label toolsLabel = new Label("Tools");
@@ -133,7 +134,6 @@ public class PaintApplication extends Application {
                 SaveFeature.setCurrentFile(imageFile);
                 isSaved = false;
             }
-
         });
 
         //Save Image
@@ -162,12 +162,18 @@ public class PaintApplication extends Application {
             CloseInterceptFeature.handleExit(event, combineImage);
         });
 
+        //Help Popup
+        helpAct.setOnAction(event -> {
+            Popup helpPopup = new Popup();
+
+            HelpFeature.handleHelp(helpPopup, primaryStage);
+        });
+
         //Showtime
         Scene scene = new Scene(root, 1150, 650);
 
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
 
     public static void main(String[] args) {

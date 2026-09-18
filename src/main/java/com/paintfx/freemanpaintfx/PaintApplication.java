@@ -82,9 +82,6 @@ public class PaintApplication extends Application {
 
         //Image Create
         ImageView imageView = new ImageView();
-
-        imageView.setFitWidth(960);
-        imageView.setFitHeight(600);
         imageView.setPreserveRatio(true);
 
         //Canvas Create
@@ -93,6 +90,12 @@ public class PaintApplication extends Application {
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvas);
+
+        //Large Image Handle
+        ScrollPane imagePane = new ScrollPane(combineArea);
+        imagePane.setPannable(true);
+        imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
         //Give Brush Int & Color Hex
         sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -108,7 +111,7 @@ public class PaintApplication extends Application {
         BorderPane root = new BorderPane();
         root.setTop(menuBar);
         root.setRight(sideMenu);
-        root.setCenter(combineArea);
+        root.setCenter(imagePane);
 
         //Open Image
         openImage.setOnAction(event -> {
@@ -123,10 +126,11 @@ public class PaintApplication extends Application {
             if (imageFile != null) {
                 Image image = new Image(imageFile.toURI().toString());
 
+                imageView.setFitHeight(0);
+                imageView.setFitWidth(0);
                 imageView.setImage(image);
 
                 SaveFeature.setCurrentFile(imageFile);
-
                 isSaved = false;
             }
 

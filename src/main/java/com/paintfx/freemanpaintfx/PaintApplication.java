@@ -91,6 +91,7 @@ public class PaintApplication extends Application {
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvas);
+        Color background = Color.web("#3d3b46");
 
         //Large Image Handle
         ScrollPane imagePane = new ScrollPane(combineArea);
@@ -115,7 +116,12 @@ public class PaintApplication extends Application {
         root.setCenter(imagePane);
 
         //Open Image
-        openImage.setOnAction(event -> {OpenFeature.open(imageView, primaryStage);});
+        openImage.setOnAction(event -> {
+            //MOVE TO OPEN FEATURE LATER
+            gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+
+            OpenFeature.open(imageView, primaryStage);
+        });
 
         //Save Image
         saveImage.setOnAction(event -> {
@@ -123,6 +129,7 @@ public class PaintApplication extends Application {
             SaveFeature.save(combineImage, primaryStage);
             isSaved = true;
         });
+
         //Save As
         saveAsImage.setOnAction(event -> {
             WritableImage combineImage = combineArea.snapshot(null,null);

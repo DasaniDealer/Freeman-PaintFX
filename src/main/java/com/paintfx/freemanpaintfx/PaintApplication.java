@@ -115,26 +115,7 @@ public class PaintApplication extends Application {
         root.setCenter(imagePane);
 
         //Open Image
-        openImage.setOnAction(event -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Select an Image File");
-
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
-            );
-
-            File imageFile = fileChooser.showOpenDialog(primaryStage);
-            if (imageFile != null) {
-                Image image = new Image(imageFile.toURI().toString());
-
-                imageView.setFitHeight(0);
-                imageView.setFitWidth(0);
-                imageView.setImage(image);
-
-                SaveFeature.setCurrentFile(imageFile);
-                isSaved = false;
-            }
-        });
+        openImage.setOnAction(event -> {OpenFeature.open(imageView, primaryStage);});
 
         //Save Image
         saveImage.setOnAction(event -> {
@@ -146,7 +127,6 @@ public class PaintApplication extends Application {
         saveAsImage.setOnAction(event -> {
             WritableImage combineImage = combineArea.snapshot(null,null);
             SaveFeature.saveAs(combineImage, primaryStage);
-            isSaved = true;
         });
 
         //Draw Line

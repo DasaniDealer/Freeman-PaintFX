@@ -62,6 +62,7 @@ public class SaveFeature {
 
                 ImageIO.write(SwingFXUtils.fromFXImage(image, null), fileExtension, saveFile);
                 currentFile = saveFile;
+                PaintApplication.isSaved = true;
             }
             catch (IOException ex) {
                 System.out.println("Error");

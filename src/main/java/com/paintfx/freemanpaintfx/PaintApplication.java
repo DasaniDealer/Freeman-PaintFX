@@ -35,7 +35,6 @@ public class PaintApplication extends Application {
 
         menuBar.getMenus().addAll(file, options, help);
 
-
         //File Submenu
         MenuItem openImage = new MenuItem("Open");
         MenuItem saveImage = new MenuItem("Save");
@@ -86,12 +85,11 @@ public class PaintApplication extends Application {
         imageView.setPreserveRatio(true);
 
         //Canvas Create
-        Canvas canvas = new Canvas(960, 600);
+        Canvas canvas = new Canvas(1150, 650);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvas);
-        Color background = Color.web("#3d3b46");
 
         //Large Image Handle
         ScrollPane imagePane = new ScrollPane(combineArea);
@@ -117,10 +115,7 @@ public class PaintApplication extends Application {
 
         //Open Image
         openImage.setOnAction(event -> {
-            //MOVE TO OPEN FEATURE LATER
-            gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
-
-            OpenFeature.open(imageView, primaryStage);
+            OpenFeature.open(imageView, primaryStage, gc, canvas);
         });
 
         //Save Image

@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -85,17 +86,28 @@ public class PaintApplication extends Application {
         imageView.setPreserveRatio(true);
 
         //Canvas Create
+        Pane canvasContainer = new Pane();
+
         Canvas canvas = new Canvas(1150, 650);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        canvasContainer.getChildren().add(canvas);
+        //Connect Canvas to Container
+        canvas.widthProperty().bind(canvasContainer.widthProperty());
+        canvas.heightProperty().bind(canvasContainer.heightProperty());
+
+        canvas.widthProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, oldInt.doubleValue(), canvas.getHeight()));
+        canvas.heightProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, canvas.getWidth(), oldInt.doubleValue()));
 
         //Image and Canvas Stack
-        StackPane combineArea = new StackPane(imageView, canvas);
+        StackPane combineArea = new StackPane(imageView, canvasContainer);
 
         //Large Image Handle
         ScrollPane imagePane = new ScrollPane(combineArea);
         imagePane.setPannable(true);
+        imagePane.setFitToWidth(true);
+        imagePane.setFitToHeight(true);
         imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);;
 
         //Give Brush Int & Color Hex
         sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -133,7 +145,7 @@ public class PaintApplication extends Application {
 
         //Draw Line
         pencilButton.setOnAction(event -> {
-            CanvasFeature.drawLine(gc);
+            CanvasFeature.drawLine(gc, canvas);
             isSaved = false;
         });
 

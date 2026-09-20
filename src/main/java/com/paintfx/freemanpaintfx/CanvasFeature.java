@@ -8,7 +8,7 @@ import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 
 public class CanvasFeature {
-
+    //Mouse Free Draw
     static void drawLine(GraphicsContext gc, Canvas canvas) {
         canvas.setOnMouseDragged(event -> {
             double x = event.getX();
@@ -25,6 +25,24 @@ public class CanvasFeature {
         });
     }
 
+    //Straight Line Draw
+    static double startX, startY;
+
+    static void drawStraight(GraphicsContext gc, Canvas canvas) {
+        canvas.setOnMousePressed(event -> {
+            startX = event.getX();
+            startY = event.getY();
+        });
+
+        canvas.setOnMouseReleased(event -> {
+            gc.beginPath();
+            gc.moveTo(startX, startY);
+            gc.lineTo(event.getX(), event.getY());
+            gc.stroke();
+        });
+    }
+
+    //Canvas Resizing
     static void canvasResize(Canvas canvas, GraphicsContext gc, double newWidth, double newHeight) {
         double oldWidth = canvas.getWidth();
         double oldHeight = canvas.getHeight();

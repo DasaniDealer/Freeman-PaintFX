@@ -55,12 +55,13 @@ public class PaintApplication extends Application {
         Label toolsLabel = new Label("Tools");
         toolsLabel.setStyle("-fx-font-weight: bold;");
         ToggleButton pencilButton = new ToggleButton("Pencil");
+        ToggleButton lineButton = new ToggleButton("Line");
         ToggleButton eraserButton = new ToggleButton("Eraser");
 
         ToggleGroup toolGroup = new ToggleGroup();
         pencilButton.setToggleGroup(toolGroup);
+        lineButton.setToggleGroup(toolGroup);
         eraserButton.setToggleGroup(toolGroup);
-        pencilButton.setSelected(true);
 
         //Colours
         Label colorLabel = new Label("Colour");
@@ -76,21 +77,21 @@ public class PaintApplication extends Application {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, pencilButton, eraserButton,
+                toolsLabel, pencilButton, lineButton, eraserButton,
                 colorLabel, colorPicker,
                 sizeLabel, sizeSlider
         );
 
-        //Image Create
+        //Image & Canvas Create
         ImageView imageView = new ImageView();
         imageView.setPreserveRatio(true);
 
-        //Canvas Create
         Pane canvasContainer = new Pane();
 
         Canvas canvas = new Canvas(1150, 650);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         canvasContainer.getChildren().add(canvas);
+
         //Connect Canvas to Container
         canvas.widthProperty().bind(canvasContainer.widthProperty());
         canvas.heightProperty().bind(canvasContainer.heightProperty());
@@ -101,9 +102,8 @@ public class PaintApplication extends Application {
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);
 
-        //Large Image Handle
         ScrollPane imagePane = new ScrollPane(combineArea);
-        imagePane.setPannable(true);
+        imagePane.setPannable(false);
         imagePane.setFitToWidth(true);
         imagePane.setFitToHeight(true);
         imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -143,17 +143,28 @@ public class PaintApplication extends Application {
             SaveFeature.saveAs(combineImage, primaryStage);
         });
 
-        //Draw Line
+        //Free Draw
         pencilButton.setOnAction(event -> {
-            CanvasFeature.drawLine(gc, canvas);
-            isSaved = false;
+            if(pencilButton.isSelected()) {
+                CanvasFeature.drawLine(gc, canvas);
+                isSaved = false;
+            }
+            else {
+                canvas.setOnMousePressed(null);
+                canvas.setOnMouseDragged(null);
+            }
         });
 
-        //Close Intercept
-        primaryStage.setOnCloseRequest(event -> {
-            WritableImage combineImage = combineArea.snapshot(null,null);
-
-            CloseInterceptFeature.handleExit(event, combineImage);
+        //Line Draw
+        lineButton.setOnAction(event -> {
+            if(lineButton.isSelected()) {
+                CanvasFeature.drawStraight(gc, canvas);
+                isSaved = false;
+            }
+            else {
+                canvas.setOnMousePressed(null);
+                canvas.setOnMouseDragged(null);
+            }
         });
 
         //Help Popup
@@ -163,7 +174,14 @@ public class PaintApplication extends Application {
             HelpFeature.handleHelp(helpPopup, primaryStage);
         });
 
-        //Showtime
+        //Close Intercept
+        primaryStage.setOnCloseRequest(event -> {
+            WritableImage combineImage = combineArea.snapshot(null,null);
+
+            CloseInterceptFeature.handleExit(event, combineImage);
+        });
+
+        //SHOWTIME
         Scene scene = new Scene(root, 1150, 650);
 
         primaryStage.setScene(scene);

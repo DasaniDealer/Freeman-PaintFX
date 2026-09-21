@@ -58,10 +58,9 @@ public class PaintApplication extends Application {
         ToggleButton lineButton = new ToggleButton("Line");
         ToggleButton eraserButton = new ToggleButton("Eraser");
 
-        ToggleGroup toolGroup = new ToggleGroup();
-        pencilButton.setToggleGroup(toolGroup);
-        lineButton.setToggleGroup(toolGroup);
-        eraserButton.setToggleGroup(toolGroup);
+        ToggleGroup toolToggle = new ToggleGroup();
+        pencilButton.setToggleGroup(toolToggle);
+        lineButton.setToggleGroup(toolToggle);
 
         //Colours
         Label colorLabel = new Label("Colour");
@@ -143,28 +142,18 @@ public class PaintApplication extends Application {
             SaveFeature.saveAs(combineImage, primaryStage);
         });
 
-        //Free Draw
-        pencilButton.setOnAction(event -> {
-            if(pencilButton.isSelected()) {
-                CanvasFeature.drawLine(gc, canvas);
-                isSaved = false;
-            }
-            else {
-                canvas.setOnMousePressed(null);
-                canvas.setOnMouseDragged(null);
-            }
-        });
+        toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
+            canvas.setOnMousePressed(null);
+            canvas.setOnMouseDragged(null);
+            canvas.setOnMouseReleased(null);
 
-        //Line Draw
-        lineButton.setOnAction(event -> {
-            if(lineButton.isSelected()) {
-                CanvasFeature.drawStraight(gc, canvas);
-                isSaved = false;
-            }
-            else {
-                canvas.setOnMousePressed(null);
-                canvas.setOnMouseDragged(null);
-            }
+            if (newToggle == null) {return;}
+
+            //Toggle Button Effects
+            if (newToggle == pencilButton) {CanvasFeature.drawLine(gc, canvas);}
+            else if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, canvas);}
+
+            isSaved = false;
         });
 
         //Help Popup

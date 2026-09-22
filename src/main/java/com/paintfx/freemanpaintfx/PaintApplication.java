@@ -89,7 +89,8 @@ public class PaintApplication extends Application {
 
         Canvas canvas = new Canvas(1150, 650);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        canvasContainer.getChildren().add(canvas);
+        Canvas previewCanvas = new Canvas(1150, 650);
+        canvasContainer.getChildren().addAll(canvas, previewCanvas);
 
         //Connect Canvas to Container
         canvas.widthProperty().bind(canvasContainer.widthProperty());
@@ -97,6 +98,12 @@ public class PaintApplication extends Application {
 
         canvas.widthProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, oldInt.doubleValue(), canvas.getHeight()));
         canvas.heightProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, canvas.getWidth(), oldInt.doubleValue()));
+
+        previewCanvas.widthProperty().bind(canvasContainer.widthProperty());
+        previewCanvas.heightProperty().bind(canvasContainer.heightProperty());
+
+        previewCanvas.widthProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(previewCanvas, previewCanvas.getGraphicsContext2D(), oldInt.doubleValue(), previewCanvas.getHeight()));
+        previewCanvas.heightProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(previewCanvas, previewCanvas.getGraphicsContext2D(), previewCanvas.getWidth(), oldInt.doubleValue()));
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);
@@ -147,11 +154,21 @@ public class PaintApplication extends Application {
             canvas.setOnMouseDragged(null);
             canvas.setOnMouseReleased(null);
 
+            previewCanvas.setOnMousePressed(null);
+            previewCanvas.setOnMouseDragged(null);
+            previewCanvas.setOnMouseReleased(null);
+
+            if (newToggle == lineButton) {
+                previewCanvas.setMouseTransparent(false);
+            } else {
+                previewCanvas.setMouseTransparent(true);
+            }
+
             if (newToggle == null) {return;}
 
             //Toggle Button Effects
             if (newToggle == pencilButton) {CanvasFeature.drawLine(gc, canvas);}
-            else if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, canvas);}
+            else if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, previewCanvas);}
 
             isSaved = false;
         });

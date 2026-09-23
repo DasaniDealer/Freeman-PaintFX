@@ -100,6 +100,10 @@ public class PaintApplication extends Application {
         Canvas previewCanvas = new Canvas(1150, 650);
         canvasContainer.getChildren().addAll(canvas, previewCanvas);
 
+        gc.setLineWidth(sizeSlider.getValue());
+        gc.setStroke(colorPicker.getValue());
+        gc.setFill(colorPicker.getValue());
+
         //Connect Canvas to Container
         canvas.widthProperty().bind(canvasContainer.widthProperty());
         canvas.heightProperty().bind(canvasContainer.heightProperty());

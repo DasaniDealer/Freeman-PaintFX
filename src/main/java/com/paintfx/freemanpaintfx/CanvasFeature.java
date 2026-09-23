@@ -30,28 +30,17 @@ public class CanvasFeature {
     static double startX, startY;
 
     static void drawStraight(GraphicsContext gc, Canvas canvas) {
-        GraphicsContext pgc = canvas.getGraphicsContext2D();
 
         canvas.setOnMousePressed(event -> {
             startX = event.getX();
             startY = event.getY();
         });
 
-        canvas.setOnMouseDragged(event -> {
-            //Clear Preview Canvas
-            pgc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-            pgc.setStroke(gc.getStroke());
-            pgc.setLineWidth(gc.getLineWidth());
-            pgc.setLineCap(gc.getLineCap());
-            pgc.setLineJoin(gc.getLineJoin());
-
-            pgc.strokeLine(startX, startY, event.getX(), event.getY());
-        });
-
         canvas.setOnMouseReleased(event -> {
-            pgc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            gc.strokeLine(startX, startY, event.getX(), event.getY());
+            gc.beginPath();
+            gc.moveTo(startX,startY);
+            gc.lineTo(event.getX(), event.getY());
+            gc.stroke();
         });
     }
 

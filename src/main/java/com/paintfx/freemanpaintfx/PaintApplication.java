@@ -55,12 +55,18 @@ public class PaintApplication extends Application {
         Label toolsLabel = new Label("Tools");
         toolsLabel.setStyle("-fx-font-weight: bold;");
         ToggleButton pencilButton = new ToggleButton("Pencil");
-        ToggleButton lineButton = new ToggleButton("Line");
+        RadioMenuItem lineButton = new RadioMenuItem("Line");
+        RadioMenuItem dashButton = new RadioMenuItem("Dashed");
         ToggleButton eraserButton = new ToggleButton("Eraser");
 
+        //Toggle Groups
         ToggleGroup toolToggle = new ToggleGroup();
         pencilButton.setToggleGroup(toolToggle);
-        lineButton.setToggleGroup(toolToggle);
+        MenuButton lineMenu = new MenuButton("Line");
+
+        ToggleGroup lineToggle = new ToggleGroup();
+        lineButton.setToggleGroup(lineToggle);
+        dashButton.setToggleGroup(lineToggle);
 
         //Colours
         Label colorLabel = new Label("Colour");
@@ -76,10 +82,12 @@ public class PaintApplication extends Application {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, pencilButton, lineButton, eraserButton,
+                toolsLabel, pencilButton, lineMenu, eraserButton,
                 colorLabel, colorPicker,
                 sizeLabel, sizeSlider
         );
+
+        lineMenu.getItems().addAll(lineButton, dashButton);
 
         //Image & Canvas Create
         ImageView imageView = new ImageView();
@@ -149,10 +157,30 @@ public class PaintApplication extends Application {
 
             if (newToggle == null) {return;}
 
+            //Unselect Dropdown Items
+            if (newToggle == pencilButton) {
+                lineToggle.selectToggle(null);
+            }
+
             //Toggle Button Effects
             if (newToggle == pencilButton) {CanvasFeature.drawLine(gc, canvas);}
             else if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, canvas);}
 
+            isSaved = false;
+        });
+
+        lineToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
+            canvas.setOnMousePressed(null);
+            canvas.setOnMouseDragged(null);
+            canvas.setOnMouseReleased(null);
+
+            if (newToggle == null) return;
+
+            //Unselect Main Menu Items
+            toolToggle.selectToggle(null);
+
+            if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, canvas);}
+            else if (newToggle == dashButton) {CanvasFeature.drawDashed(gc, canvas, gc.getLineWidth());}
             isSaved = false;
         });
 

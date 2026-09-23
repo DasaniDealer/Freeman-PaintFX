@@ -42,6 +42,26 @@ public class CanvasFeature {
         });
     }
 
+    static void drawDashed(GraphicsContext gc, Canvas canvas, double lineWidth) {
+        canvas.setOnMousePressed(event -> {
+            startX = event.getX();
+            startY = event.getY();
+        });
+
+        canvas.setOnMouseReleased(event -> {
+            gc.setLineWidth(lineWidth);
+
+            gc.setLineDashes(3 * lineWidth, 2 * lineWidth);
+
+            gc.beginPath();
+            gc.moveTo(startX, startY);
+            gc.lineTo(event.getX(), event.getY());
+            gc.stroke();
+
+            gc.setLineDashes((double[]) null);
+        });
+    }
+
     //Canvas Resizing
     static void canvasResize(Canvas canvas, GraphicsContext gc, double newWidth, double newHeight) {
         double oldWidth = canvas.getWidth();

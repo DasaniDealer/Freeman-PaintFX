@@ -1,14 +1,12 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Window;
 
 public class ShapeFeature {
     private static double startX;
@@ -16,8 +14,10 @@ public class ShapeFeature {
 
     private static Rectangle rectangle;
     private static Polygon triangle;
+    private static Circle circle;
 
-    public static void rectDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider, Boolean filled, Boolean dashed) {
+    public static void rectDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+                                Boolean filled, Boolean dashed, Boolean square) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
             startY = event.getY();
@@ -26,12 +26,8 @@ public class ShapeFeature {
             rectangle.setX(startX);
             rectangle.setY(startY);
 
-            if(filled) {
-                rectangle.setFill(colorPicker.getValue());
-            }
-            else {
-                rectangle.setFill(Color.TRANSPARENT);
-            }
+            if(filled) {rectangle.setFill(colorPicker.getValue());}
+            else {rectangle.setFill(Color.TRANSPARENT);}
 
             rectangle.setStroke(colorPicker.getValue());
             rectangle.setStrokeWidth(sizeSlider.getValue());
@@ -50,14 +46,25 @@ public class ShapeFeature {
             double currentX = event.getX();
             double currentY = event.getY();
 
-            double x = Math.min(startX, currentX);
-            double y = Math.min(startY, currentY);
-
             double width = Math.abs(startX - currentX);
             double height = Math.abs(startY - currentY);
 
-            rectangle.setX(x);
-            rectangle.setY(y);
+            if(square) {
+                double side = Math.max(width, height);
+                width = side;
+                height = side;
+
+                double x = (currentX < startX) ? startX - side : startX;
+                double y = (currentY < startY) ? startY - side : startY;
+
+                rectangle.setX(x);
+                rectangle.setY(y);
+            }
+            else {
+                rectangle.setX(Math.min(startX, currentX));
+                rectangle.setY(Math.min(startY, currentY));
+            }
+
             rectangle.setWidth(width);
             rectangle.setHeight(height);
         });
@@ -72,12 +79,8 @@ public class ShapeFeature {
 
             triangle = new Polygon();
 
-            if(filled) {
-                triangle.setFill(colorPicker.getValue());
-            }
-            else {
-                triangle.setFill(Color.TRANSPARENT);
-            }
+            if(filled) {triangle.setFill(colorPicker.getValue());}
+            else {triangle.setFill(Color.TRANSPARENT);}
 
             triangle.setStroke(colorPicker.getValue());
             triangle.setStrokeWidth(sizeSlider.getValue());
@@ -114,5 +117,42 @@ public class ShapeFeature {
 
         canvas.setOnMouseReleased(event -> {triangle = null;});
     }
+
+    public static void circleDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider, Boolean filled, Boolean dashed) {
+        canvas.setOnMousePressed( event -> {
+            startX = event.getX();
+            startY = event.getY();
+
+            circle = new Circle(startX, startY, 0);
+
+            if(filled) {circle.setFill(colorPicker.getValue());}
+            else {circle.setFill(Color.TRANSPARENT);}
+
+            circle.setStroke(colorPicker.getValue());
+            circle.setStrokeWidth(sizeSlider.getValue());
+
+            if (dashed) {
+                double lineWidth = sizeSlider.getValue();
+                circle.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
+            }
+
+            canvas.getChildren().add(circle);
+        });
+
+        canvas.setOnMouseDragged(event -> {
+            if (circle == null) return;
+
+            double distanceX = event.getX() - startX;
+            double distanceY = event.getY() - startY;
+
+            double radius = Math.sqrt((distanceX * distanceX) + (distanceY * distanceY));
+            circle.setRadius(radius);
+        });
+
+        canvas.setOnMouseReleased(event -> {circle = null;});
+    }
 }
+
+
+
 

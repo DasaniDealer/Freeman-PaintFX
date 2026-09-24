@@ -45,7 +45,6 @@ public class PaintApplication extends Application {
 
         //Help Submenu
         MenuItem helpAct = new MenuItem("About Paint");
-
         help.getItems().addAll(helpAct);
 
         //Side Menu
@@ -61,13 +60,19 @@ public class PaintApplication extends Application {
 
         ToggleButton eraserButton = new ToggleButton("Eraser");
 
+        RadioMenuItem squareButton = new RadioMenuItem("Square");
+        RadioMenuItem dashSquareButton = new RadioMenuItem("Dashed Square");
         RadioMenuItem rectButton = new RadioMenuItem("Rectangle");
         RadioMenuItem dashRectButton = new RadioMenuItem("Dashed Rectangle");
         RadioMenuItem triangleButton = new RadioMenuItem("Triangle");
         RadioMenuItem dashTriangleButton = new RadioMenuItem("Dashed Triangle");
+        RadioMenuItem circleButton = new RadioMenuItem("Circle");
+        RadioMenuItem dashCircleButton = new RadioMenuItem("Dashed Circle");
 
+        RadioMenuItem fillSquareButton = new RadioMenuItem("Filled Square");
         RadioMenuItem fillRectButton = new RadioMenuItem("Filled Rectangle");
         RadioMenuItem fillTriangleButton = new RadioMenuItem("Filled Triangle");
+        RadioMenuItem fillCircleButton = new RadioMenuItem("Filled Circle");
 
         //Menu Groups
         MenuButton lineMenu = new MenuButton("Line");
@@ -84,13 +89,19 @@ public class PaintApplication extends Application {
 
         ToggleGroup shapeToggle = new ToggleGroup();
         //Shape Menu
+        squareButton.setToggleGroup(shapeToggle);
+        dashSquareButton.setToggleGroup(shapeToggle);
         rectButton.setToggleGroup(shapeToggle);
         dashRectButton.setToggleGroup(shapeToggle);
         triangleButton.setToggleGroup(shapeToggle);
         dashTriangleButton.setToggleGroup(shapeToggle);
+        circleButton.setToggleGroup(shapeToggle);
+        dashCircleButton.setToggleGroup(shapeToggle);
         //Fill Shape Menu
+        fillSquareButton.setToggleGroup(shapeToggle);
         fillRectButton.setToggleGroup(shapeToggle);
         fillTriangleButton.setToggleGroup(shapeToggle);
+        fillCircleButton.setToggleGroup(shapeToggle);
 
         //Colours
         Label colorLabel = new Label("Colour");
@@ -112,8 +123,8 @@ public class PaintApplication extends Application {
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
-        shapeMenu.getItems().addAll(rectButton, dashRectButton, triangleButton, dashTriangleButton);
-        fillShapeMenu.getItems().addAll(fillRectButton, fillTriangleButton);
+        shapeMenu.getItems().addAll(squareButton, dashSquareButton, rectButton, dashRectButton, triangleButton, dashTriangleButton, circleButton, dashCircleButton);
+        fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillCircleButton);
 
         //Image & Canvas Create
         ImageView imageView = new ImageView();
@@ -159,9 +170,7 @@ public class PaintApplication extends Application {
         root.setCenter(imagePane);
 
         //Open Image
-        openImage.setOnAction(event -> {
-            OpenFeature.open(imageView, primaryStage, gc, canvas, canvasContainer);
-        });
+        openImage.setOnAction(event -> {OpenFeature.open(imageView, primaryStage, gc, canvas, canvasContainer);});
 
         //Save Image
         saveImage.setOnAction(event -> {
@@ -175,6 +184,7 @@ public class PaintApplication extends Application {
             WritableImage combineImage = combineArea.snapshot(null,null);
             SaveFeature.saveAs(combineImage, primaryStage);
         });
+
         //Free Draw/Erase
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             canvasContainer.setOnMousePressed(null);
@@ -223,13 +233,21 @@ public class PaintApplication extends Application {
             toolToggle.selectToggle(null);
             lineToggle.selectToggle(null);
             //Toggle Button Effects
-            if (newToggle == rectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
-            else if (newToggle == fillRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
-            else if (newToggle == dashRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
+            if (newToggle == squareButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, false, true);}
+            else if (newToggle == fillSquareButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, true, false, true);}
+            else if (newToggle == dashSquareButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, true, true);}
+
+            if (newToggle == rectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, false, false);}
+            else if (newToggle == fillRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, true, false, false);}
+            else if (newToggle == dashRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, true, false);}
 
             else if (newToggle == triangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
             else if (newToggle == fillTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
             else if (newToggle == dashTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
+
+            else if (newToggle == circleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
+            else if (newToggle == fillCircleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
+            else if (newToggle == dashCircleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
 
             isSaved = false;
         });

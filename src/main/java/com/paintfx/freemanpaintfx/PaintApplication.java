@@ -63,8 +63,11 @@ public class PaintApplication extends Application {
 
         RadioMenuItem rectButton = new RadioMenuItem("Rectangle");
         RadioMenuItem dashRectButton = new RadioMenuItem("Dashed Rectangle");
+        RadioMenuItem triangleButton = new RadioMenuItem("Triangle");
+        RadioMenuItem dashTriangleButton = new RadioMenuItem("Dashed Triangle");
 
         RadioMenuItem fillRectButton = new RadioMenuItem("Filled Rectangle");
+        RadioMenuItem fillTriangleButton = new RadioMenuItem("Filled Triangle");
 
         //Menu Groups
         MenuButton lineMenu = new MenuButton("Line");
@@ -83,8 +86,11 @@ public class PaintApplication extends Application {
         //Shape Menu
         rectButton.setToggleGroup(shapeToggle);
         dashRectButton.setToggleGroup(shapeToggle);
+        triangleButton.setToggleGroup(shapeToggle);
+        dashTriangleButton.setToggleGroup(shapeToggle);
         //Fill Shape Menu
         fillRectButton.setToggleGroup(shapeToggle);
+        fillTriangleButton.setToggleGroup(shapeToggle);
 
         //Colours
         Label colorLabel = new Label("Colour");
@@ -106,8 +112,8 @@ public class PaintApplication extends Application {
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
-        shapeMenu.getItems().addAll(rectButton, dashRectButton);
-        fillShapeMenu.getItems().add(fillRectButton);
+        shapeMenu.getItems().addAll(rectButton, dashRectButton, triangleButton, dashTriangleButton);
+        fillShapeMenu.getItems().addAll(fillRectButton, fillTriangleButton);
 
         //Image & Canvas Create
         ImageView imageView = new ImageView();
@@ -220,6 +226,10 @@ public class PaintApplication extends Application {
             if (newToggle == rectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
             else if (newToggle == fillRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
             else if (newToggle == dashRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
+
+            else if (newToggle == triangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
+            else if (newToggle == fillTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
+            else if (newToggle == dashTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
 
             isSaved = false;
         });

@@ -111,10 +111,6 @@ public class PaintApplication extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         canvasContainer.getChildren().addAll(canvas);
 
-        gc.setLineWidth(sizeSlider.getValue());
-        gc.setStroke(colorPicker.getValue());
-        gc.setFill(colorPicker.getValue());
-
         //Connect Canvas to Container
         canvas.widthProperty().bind(canvasContainer.widthProperty());
         canvas.heightProperty().bind(canvasContainer.heightProperty());
@@ -141,6 +137,8 @@ public class PaintApplication extends Application {
             gc.setFill(newValue);
             gc.setStroke(newValue);
         });
+
+
 
         //MAIN LAYOUT
         BorderPane root = new BorderPane();
@@ -181,7 +179,6 @@ public class PaintApplication extends Application {
 
             //Toggle Button Effects
             if (newToggle == pencilButton) {CanvasFeature.drawLine(gc, canvas);}
-            else if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, canvas);}
 
             isSaved = false;
         });
@@ -198,7 +195,7 @@ public class PaintApplication extends Application {
             shapeToggle.selectToggle(null);
 
             if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, canvas);}
-            else if (newToggle == dashButton) {CanvasFeature.drawDashed(gc, canvas, gc.getLineWidth());}
+            else if (newToggle == dashButton) {CanvasFeature.drawDashed(gc, canvas);}
             isSaved = false;
         });
 

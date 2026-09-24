@@ -41,16 +41,19 @@ public class CanvasFeature {
             gc.moveTo(startX,startY);
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
+            gc.closePath();
         });
     }
 
-    static void drawDashed(GraphicsContext gc, Canvas canvas, double lineWidth) {
+    static void drawDashed(GraphicsContext gc, Canvas canvas) {
         canvas.setOnMousePressed(event -> {
             startX = event.getX();
             startY = event.getY();
         });
 
         canvas.setOnMouseReleased(event -> {
+            double lineWidth = gc.getLineWidth();
+
             gc.setLineWidth(lineWidth);
 
             gc.setLineDashes(3 * lineWidth, 2 * lineWidth);
@@ -59,6 +62,7 @@ public class CanvasFeature {
             gc.moveTo(startX, startY);
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
+            gc.closePath();
 
             gc.setLineDashes((double[]) null);
         });

@@ -15,7 +15,7 @@ public class ShapeFeature {
 
     private static Rectangle rectangle;
 
-    public static void rectDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider, Boolean filled) {
+    public static void rectDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider, Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
             startY = event.getY();
@@ -30,8 +30,14 @@ public class ShapeFeature {
             else {
                 rectangle.setFill(Color.TRANSPARENT);
             }
+
             rectangle.setStroke(colorPicker.getValue());
             rectangle.setStrokeWidth(sizeSlider.getValue());
+
+            if (dashed) {
+                double lineWidth = sizeSlider.getValue();
+                rectangle.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
+            }
 
             canvas.getChildren().add(rectangle);
         });

@@ -55,27 +55,35 @@ public class PaintApplication extends Application {
         Label toolsLabel = new Label("Tools");
         toolsLabel.setStyle("-fx-font-weight: bold;");
         ToggleButton pencilButton = new ToggleButton("Pencil");
+
         RadioMenuItem lineButton = new RadioMenuItem("Line");
         RadioMenuItem dashButton = new RadioMenuItem("Dashed");
+
         ToggleButton eraserButton = new ToggleButton("Eraser");
 
         RadioMenuItem rectButton = new RadioMenuItem("Rectangle");
+        RadioMenuItem dashRectButton = new RadioMenuItem("Dashed Rectangle");
+
         RadioMenuItem fillRectButton = new RadioMenuItem("Filled Rectangle");
+
+        //Menu Groups
+        MenuButton lineMenu = new MenuButton("Line");
+        MenuButton shapeMenu = new MenuButton("Shape");
+        MenuButton fillShapeMenu = new MenuButton("Filled Shape");
 
         //Toggle Groups
         ToggleGroup toolToggle = new ToggleGroup();
         pencilButton.setToggleGroup(toolToggle);
-
-        MenuButton lineMenu = new MenuButton("Line");
-        MenuButton shapeMenu = new MenuButton("Shape");
-        MenuButton fillShapeMenu = new MenuButton("Filled Shape");
 
         ToggleGroup lineToggle = new ToggleGroup();
         lineButton.setToggleGroup(lineToggle);
         dashButton.setToggleGroup(lineToggle);
 
         ToggleGroup shapeToggle = new ToggleGroup();
+        //Shape Menu
         rectButton.setToggleGroup(shapeToggle);
+        dashRectButton.setToggleGroup(shapeToggle);
+        //Fill Shape Menu
         fillRectButton.setToggleGroup(shapeToggle);
 
         //Colours
@@ -98,7 +106,7 @@ public class PaintApplication extends Application {
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
-        shapeMenu.getItems().add(rectButton);
+        shapeMenu.getItems().addAll(rectButton, dashRectButton);
         fillShapeMenu.getItems().add(fillRectButton);
 
         //Image & Canvas Create
@@ -138,8 +146,6 @@ public class PaintApplication extends Application {
             gc.setStroke(newValue);
         });
 
-
-
         //MAIN LAYOUT
         BorderPane root = new BorderPane();
         root.setTop(menuBar);
@@ -163,7 +169,7 @@ public class PaintApplication extends Application {
             WritableImage combineImage = combineArea.snapshot(null,null);
             SaveFeature.saveAs(combineImage, primaryStage);
         });
-
+        //Free Draw/Erase
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             canvasContainer.setOnMousePressed(null);
             canvasContainer.setOnMouseDragged(null);
@@ -178,15 +184,12 @@ public class PaintApplication extends Application {
             }
 
             //Toggle Button Effects
-            if (newToggle == pencilButton) {
-                CanvasFeature.drawLine(canvasContainer, colorPicker, sizeSlider);
-            }
+            if (newToggle == pencilButton) {CanvasFeature.drawLine(canvasContainer, colorPicker, sizeSlider);}
 
             isSaved = false;
         });
-
+        //Lines
         lineToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            boolean dashed = false;
             canvasContainer.setOnMousePressed(null);
             canvasContainer.setOnMouseDragged(null);
             canvasContainer.setOnMouseReleased(null);
@@ -196,21 +199,14 @@ public class PaintApplication extends Application {
             //Unselect Main Menu Items
             toolToggle.selectToggle(null);
             shapeToggle.selectToggle(null);
+            //Toggle Button Effects
+            if (newToggle == lineButton) {CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, false);}
+            else if (newToggle == dashButton) {CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, true);}
 
-            if (newToggle == lineButton) {
-                dashed = false;
-                CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, dashed);
-            }
-            else if (newToggle == dashButton) {
-                dashed = true;
-                CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, dashed);
-            }
             isSaved = false;
         });
-
+        //Shapes
         shapeToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            boolean filled = false;
-
             canvasContainer.setOnMousePressed(null);
             canvasContainer.setOnMouseDragged(null);
             canvasContainer.setOnMouseReleased(null);
@@ -220,16 +216,10 @@ public class PaintApplication extends Application {
             //Unselect Main Menu Items
             toolToggle.selectToggle(null);
             lineToggle.selectToggle(null);
-
-            if (newToggle == rectButton) {
-                filled = false;
-                ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, filled);
-            }
-
-            if (newToggle == fillRectButton) {
-                filled = true;
-                ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, filled);
-            }
+            //Toggle Button Effects
+            if (newToggle == rectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
+            else if (newToggle == fillRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
+            else if (newToggle == dashRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
 
             isSaved = false;
         });

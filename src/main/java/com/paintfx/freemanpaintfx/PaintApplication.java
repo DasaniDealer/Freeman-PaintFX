@@ -148,7 +148,7 @@ public class PaintApplication extends Application {
 
         //Open Image
         openImage.setOnAction(event -> {
-            OpenFeature.open(imageView, primaryStage, gc, canvas);
+            OpenFeature.open(imageView, primaryStage, gc, canvas, canvasContainer);
         });
 
         //Save Image
@@ -165,9 +165,9 @@ public class PaintApplication extends Application {
         });
 
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            canvas.setOnMousePressed(null);
-            canvas.setOnMouseDragged(null);
-            canvas.setOnMouseReleased(null);
+            canvasContainer.setOnMousePressed(null);
+            canvasContainer.setOnMouseDragged(null);
+            canvasContainer.setOnMouseReleased(null);
 
             if (newToggle == null) {return;}
 
@@ -178,15 +178,18 @@ public class PaintApplication extends Application {
             }
 
             //Toggle Button Effects
-            if (newToggle == pencilButton) {CanvasFeature.drawLine(gc, canvas);}
+            if (newToggle == pencilButton) {
+                CanvasFeature.drawLine(canvasContainer, colorPicker, sizeSlider);
+            }
 
             isSaved = false;
         });
 
         lineToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            canvas.setOnMousePressed(null);
-            canvas.setOnMouseDragged(null);
-            canvas.setOnMouseReleased(null);
+            boolean dashed = false;
+            canvasContainer.setOnMousePressed(null);
+            canvasContainer.setOnMouseDragged(null);
+            canvasContainer.setOnMouseReleased(null);
 
             if (newToggle == null) return;
 
@@ -194,8 +197,14 @@ public class PaintApplication extends Application {
             toolToggle.selectToggle(null);
             shapeToggle.selectToggle(null);
 
-            if (newToggle == lineButton) {CanvasFeature.drawStraight(gc, canvas);}
-            else if (newToggle == dashButton) {CanvasFeature.drawDashed(gc, canvas);}
+            if (newToggle == lineButton) {
+                dashed = false;
+                CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, dashed);
+            }
+            else if (newToggle == dashButton) {
+                dashed = true;
+                CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, dashed);
+            }
             isSaved = false;
         });
 

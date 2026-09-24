@@ -4,12 +4,13 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 
 public class OpenFeature {
-    public static void open(ImageView imageView, Stage primaryStage, GraphicsContext gc, Canvas canvas) {
+    public static void open(ImageView imageView, Stage primaryStage, GraphicsContext gc, Canvas canvas, Pane canvasContainer) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select an Image File");
 
@@ -18,19 +19,28 @@ public class OpenFeature {
         );
 
         File imageFile = fileChooser.showOpenDialog(primaryStage);
-        if (imageFile != null) {
-            Image image = new Image(imageFile.toURI().toString());
+        try {
+            if (imageFile != null) {
+                Image image = new Image(imageFile.toURI().toString());
 
-            imageView.setFitHeight(0);
-            imageView.setFitWidth(0);
-            imageView.setImage(image);
+                imageView.setImage(image);
+                imageView.setFitHeight(image.getHeight());
+                imageView.setFitWidth(image.getWidth());
 
-            imageView.setPreserveRatio(true);
+                canvasContainer.getChildren().clear();
+                canvasContainer.getChildren().add(canvas);
 
-            gc.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+                imageView.setPreserveRatio(true);
 
-            SaveFeature.setCurrentFile(imageFile);
-            PaintApplication.isSaved = false;
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                SaveFeature.setCurrentFile(imageFile);
+                PaintApplication.isSaved = false;
+            }
+        }
+
+        catch (Exception error) {
+            System.err.println("Error loading image file: " + error.getMessage());
         }
     }
 }

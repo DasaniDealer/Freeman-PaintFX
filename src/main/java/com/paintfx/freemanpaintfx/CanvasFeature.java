@@ -2,70 +2,71 @@ package com.paintfx.freemanpaintfx;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Slider;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeLineJoin;
+import javafx.scene.shape.*;
 
 public class CanvasFeature {
+    static double startX, startY;
+    //Object Initialization
+    static Path path;
+    static Line line;
+
     //Mouse Free Draw
-    static void drawLine(GraphicsContext gc, Canvas canvas) {
-        canvas.setOnMouseDragged(event -> {
-            double x = event.getX();
-            double y = event.getY();
-
-            gc.lineTo(x, y);
-            gc.stroke();
-        });
-
+    static void drawLine(Pane canvas, ColorPicker color, Slider size) {
         canvas.setOnMousePressed(event -> {
-            gc.beginPath();
-            gc.moveTo(event.getX(), event.getY());
-            gc.stroke();
+            path = new Path();
+            //Path Settings
+            path.setStroke(color.getValue());
+            path.setStrokeWidth(size.getValue());
+            path.setStrokeLineCap(StrokeLineCap.ROUND);
+            path.setStrokeLineJoin(StrokeLineJoin.ROUND);
+
+            path.getElements().add(new MoveTo(event.getX(), event.getY()));
+
+            canvas.getChildren().add(path);
         });
+        canvas.setOnMouseDragged(event -> {
+            if (path == null) {return;}
+
+            path.getElements().add(new LineTo(event.getX(), event.getY()));
+        });
+
+        canvas.setOnMouseReleased(event -> {path = null;});
     }
 
     //Straight Line Draw
-    static double startX, startY;
-
-    static void drawStraight(GraphicsContext gc, Canvas canvas) {
+    static void drawStraight(Pane canvas, ColorPicker color, Slider size, Boolean dashed) {
 
         canvas.setOnMousePressed(event -> {
             startX = event.getX();
             startY = event.getY();
+
+            line = new Line(startX,startY,startX,startY);
+
+            line.setStroke(color.getValue());
+            line.setStrokeWidth(size.getValue());
+            line.setStrokeLineCap(StrokeLineCap.ROUND);
+            //Dash Boolean
+            if (dashed) {
+                double lineWidth = size.getValue();
+                line.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
+            }
+
+            canvas.getChildren().add(line);
         });
 
-        canvas.setOnMouseReleased(event -> {
-            gc.beginPath();
-            gc.moveTo(startX,startY);
-            gc.lineTo(event.getX(), event.getY());
-            gc.stroke();
-            gc.closePath();
-        });
-    }
+        canvas.setOnMouseDragged(event -> {
+            if (line == null) {return;}
 
-    static void drawDashed(GraphicsContext gc, Canvas canvas) {
-        canvas.setOnMousePressed(event -> {
-            startX = event.getX();
-            startY = event.getY();
+            line.setEndX(event.getX());
+            line.setEndY(event.getY());
         });
 
-        canvas.setOnMouseReleased(event -> {
-            double lineWidth = gc.getLineWidth();
-
-            gc.setLineWidth(lineWidth);
-
-            gc.setLineDashes(3 * lineWidth, 2 * lineWidth);
-
-            gc.beginPath();
-            gc.moveTo(startX, startY);
-            gc.lineTo(event.getX(), event.getY());
-            gc.stroke();
-            gc.closePath();
-
-            gc.setLineDashes((double[]) null);
-        });
+        canvas.setOnMouseReleased(event -> {line = null;});
     }
 
     //Canvas Resizing

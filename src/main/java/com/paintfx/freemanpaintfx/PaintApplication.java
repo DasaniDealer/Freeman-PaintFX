@@ -8,6 +8,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -112,6 +115,7 @@ public class PaintApplication extends Application {
         fillRectButton.setToggleGroup(shapeToggle);
         fillTriangleButton.setToggleGroup(shapeToggle);
         fillCircleButton.setToggleGroup(shapeToggle);
+        fillEllipseButton.setToggleGroup(shapeToggle);
 
         //Colours
         Label colorLabel = new Label("Colour");
@@ -174,14 +178,9 @@ public class PaintApplication extends Application {
             gc.setStroke(newValue);
         });
 
-        //MAIN LAYOUT
-        BorderPane root = new BorderPane();
-        root.setTop(menuBar);
-        root.setRight(sideMenu);
-        root.setCenter(imagePane);
-
         //Open Image
         openImage.setOnAction(event -> {OpenFeature.open(imageView, primaryStage, gc, canvas, canvasContainer);});
+        openImage.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
 
         //Save Image
         saveImage.setOnAction(event -> {
@@ -189,12 +188,14 @@ public class PaintApplication extends Application {
             SaveFeature.save(combineImage, primaryStage);
             isSaved = true;
         });
+        saveImage.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
 
         //Save As
         saveAsImage.setOnAction(event -> {
             WritableImage combineImage = combineArea.snapshot(null,null);
             SaveFeature.saveAs(combineImage, primaryStage);
         });
+        saveAsImage.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN));
 
         //Free Draw/Erase
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
@@ -280,6 +281,12 @@ public class PaintApplication extends Application {
 
             CloseInterceptFeature.handleExit(event, combineImage);
         });
+
+        //MAIN LAYOUT
+        BorderPane root = new BorderPane();
+        root.setTop(menuBar);
+        root.setRight(sideMenu);
+        root.setCenter(imagePane);
 
         //SHOWTIME
         Scene scene = new Scene(root, 1150, 650);

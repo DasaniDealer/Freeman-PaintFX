@@ -27,44 +27,18 @@ public class PaintApplication extends Application {
 
         primaryStage.setTitle("(Pain)t");
 
-        //Image & Canvas Create
-        ImageView imageView = new ImageView();
-        imageView.setPreserveRatio(true);
-
-        Pane canvasContainer = new Pane();
-
-        Canvas canvas = new Canvas(1150, 650);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        canvasContainer.getChildren().addAll(canvas);
-
-        DrawSettings drawSettings = new DrawSettings(gc);
+        DrawSettings drawSettings = new DrawSettings();
         ToggleButton grabButton = drawSettings.getGrabButton();
-
-        //Connect Canvas to Container
-        canvas.widthProperty().bind(canvasContainer.widthProperty());
-        canvas.heightProperty().bind(canvasContainer.heightProperty());
-
-        canvas.widthProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, oldInt.doubleValue(), canvas.getHeight()));
-        canvas.heightProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, canvas.getWidth(), oldInt.doubleValue()));
-
-        //Image and Canvas Stack
-        StackPane combineArea = new StackPane(imageView, canvasContainer);
-
-        ScrollPane imagePane = new ScrollPane(combineArea);
-        imagePane.setPannable(false);
-        imagePane.setFitToWidth(true);
-        imagePane.setFitToHeight(true);
-        imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);;
 
         //Menu Bar
         MenuBar menuBar = new MenuBar();
 
         Menu file = new Menu("File");
         Menu options = new Menu("Options");
+        Menu tabs = new Menu("Tabs");
         Menu help = new Menu("Help");
 
-        menuBar.getMenus().addAll(file, options, help);
+        menuBar.getMenus().addAll(file, options, tabs, help);
 
         //File Submenu
         MenuItem openImage = new MenuItem("Open");
@@ -73,11 +47,17 @@ public class PaintApplication extends Application {
 
         file.getItems().addAll(openImage, saveImage, saveAsImage);
 
+        //Tabs Submenu
+        TabPane tabPane = new TabPane();
+
+        MenuItem addTab = new MenuItem("Add Tab");
+        tabs.getItems().addAll(addTab);
+
         //Help Submenu
         MenuItem helpAct = new MenuItem("About Paint");
         help.getItems().addAll(helpAct);
 
-        //Side Menu
+        //region Side Menu
         VBox sideMenu = new VBox(15);
         sideMenu.setStyle("-fx-padding: 15; -fx-background-color: #c5c7ca; -fx-pref-width: 160;");
 
@@ -133,6 +113,7 @@ public class PaintApplication extends Application {
                 toolsLabel, pencilButton, lineMenu, shapeMenu, dashMenu, fillShapeMenu, eraserButton,
                 drawSettings
         );
+        //endregion
 
         lineMenu.getItems().addAll(lineButton, dashButton);
         shapeMenu.getItems().addAll(squareButton, rectButton, triangleButton, circleButton, ellipseButton);
@@ -140,93 +121,142 @@ public class PaintApplication extends Application {
         fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillCircleButton, fillEllipseButton);
 
         //Open Image
-        openImage.setOnAction(event -> {OpenFeature.open(imageView, primaryStage, gc, canvas, canvasContainer);});
+        openImage.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                OpenFeature.open(context.imageView(), primaryStage, context.gc(), context.canvas(), context.canvasContainer());
+            }
+        });
         openImage.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
 
         //Save Image
         saveImage.setOnAction(event -> {
-            WritableImage combineImage = combineArea.snapshot(null,null);
-            SaveFeature.save(combineImage, primaryStage);
-            isSaved = true;
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                WritableImage combineImage = context.combineArea().snapshot(null, null);
+                SaveFeature.save(combineImage, primaryStage);
+                isSaved = true;
+            }
         });
         saveImage.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
 
         //Save As
         saveAsImage.setOnAction(event -> {
-            WritableImage combineImage = combineArea.snapshot(null,null);
-            SaveFeature.saveAs(combineImage, primaryStage);
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                WritableImage combineImage = context.combineArea().snapshot(null, null);
+                SaveFeature.saveAs(combineImage, primaryStage);
+                isSaved = true;
+            }
         });
         saveAsImage.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN));
 
         //Free Draw/Erase
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            canvasContainer.setOnMousePressed(null);
-            canvasContainer.setOnMouseDragged(null);
-            canvasContainer.setOnMouseReleased(null);
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                context.canvasContainer().setOnMousePressed(null);
+                context.canvasContainer().setOnMouseDragged(null);
+                context.canvasContainer().setOnMouseReleased(null);
 
-            if (newToggle == null) {return;}
+                if (newToggle == null) {
+                    return;
+                }
 
-            //Unselect Dropdown Items
-            lineToggle.selectToggle(null);
-            shapeToggle.selectToggle(null);
+                //Unselect Dropdown Items
+                lineToggle.selectToggle(null);
+                shapeToggle.selectToggle(null);
 
-            //Toggle Button Effects
-            if (newToggle == pencilButton) {CanvasFeature.drawLine(canvasContainer, drawSettings);}
+                //Toggle Button Effects
+                if (newToggle == pencilButton) {
+                    CanvasFeature.drawLine(context.canvasContainer(), drawSettings);
+                }
 
-            if (newToggle == grabButton) {CanvasFeature.grabColor(canvasContainer, drawSettings, toolToggle);}
+                if (newToggle == grabButton) {
+                    CanvasFeature.grabColor(context.canvasContainer(), drawSettings, toolToggle);
+                }
 
-            isSaved = false;
+                isSaved = false;
+            }
         });
         //Lines
         lineToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            canvasContainer.setOnMousePressed(null);
-            canvasContainer.setOnMouseDragged(null);
-            canvasContainer.setOnMouseReleased(null);
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                context.canvasContainer().setOnMousePressed(null);
+                context.canvasContainer().setOnMouseDragged(null);
+                context.canvasContainer().setOnMouseReleased(null);
 
-            if (newToggle == null) return;
+                if (newToggle == null) return;
 
-            //Unselect Main Menu Items
-            toolToggle.selectToggle(null);
-            shapeToggle.selectToggle(null);
-            //Toggle Button Effects
-            if (newToggle == lineButton) {CanvasFeature.drawStraight(canvasContainer, drawSettings, false);}
-            else if (newToggle == dashButton) {CanvasFeature.drawStraight(canvasContainer, drawSettings, true);}
+                //Unselect Main Menu Items
+                toolToggle.selectToggle(null);
+                shapeToggle.selectToggle(null);
+                //Toggle Button Effects
+                if (newToggle == lineButton) {
+                    CanvasFeature.drawStraight(context.canvasContainer(), drawSettings, false);
+                } else if (newToggle == dashButton) {
+                    CanvasFeature.drawStraight(context.canvasContainer(), drawSettings, true);
+                }
 
-            isSaved = false;
+                isSaved = false;
+            }
         });
         //Shapes
         shapeToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            canvasContainer.setOnMousePressed(null);
-            canvasContainer.setOnMouseDragged(null);
-            canvasContainer.setOnMouseReleased(null);
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                context.canvasContainer().setOnMousePressed(null);
+                context.canvasContainer().setOnMouseDragged(null);
+                context.canvasContainer().setOnMouseReleased(null);
 
-            if (newToggle == null) return;
+                if (newToggle == null) return;
 
-            //Unselect Main Menu Items
-            toolToggle.selectToggle(null);
-            lineToggle.selectToggle(null);
-            //Toggle Button Effects
-            if (newToggle == squareButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, false, true);}
-            else if (newToggle == fillSquareButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, true, false, true);}
-            else if (newToggle == dashSquareButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, true, true);}
+                //Unselect Main Menu Items
+                toolToggle.selectToggle(null);
+                lineToggle.selectToggle(null);
+                //region Toggle Button Effects
+                if (newToggle == squareButton) {
+                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, false, true);
+                } else if (newToggle == fillSquareButton) {
+                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, true, false, true);
+                } else if (newToggle == dashSquareButton) {
+                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, true, true);
+                }
 
-            if (newToggle == rectButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, false, false);}
-            else if (newToggle == fillRectButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, true, false, false);}
-            else if (newToggle == dashRectButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, true, false);}
+                if (newToggle == rectButton) {
+                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, false, false);
+                } else if (newToggle == fillRectButton) {
+                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, true, false, false);
+                } else if (newToggle == dashRectButton) {
+                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, true, false);
+                } else if (newToggle == triangleButton) {
+                    ShapeFeature.triangleDraw(context.canvasContainer(), drawSettings, false, false);
+                } else if (newToggle == fillTriangleButton) {
+                    ShapeFeature.triangleDraw(context.canvasContainer(), drawSettings, true, false);
+                } else if (newToggle == dashTriangleButton) {
+                    ShapeFeature.triangleDraw(context.canvasContainer(), drawSettings, false, true);
+                } else if (newToggle == circleButton) {
+                    ShapeFeature.circleDraw(context.canvasContainer(), drawSettings, false, false);
+                } else if (newToggle == fillCircleButton) {
+                    ShapeFeature.circleDraw(context.canvasContainer(), drawSettings, true, false);
+                } else if (newToggle == dashCircleButton) {
+                    ShapeFeature.circleDraw(context.canvasContainer(), drawSettings, false, true);
+                } else if (newToggle == ellipseButton) {
+                    ShapeFeature.ellipseDraw(context.canvasContainer(), drawSettings, false, false);
+                } else if (newToggle == fillEllipseButton) {
+                    ShapeFeature.ellipseDraw(context.canvasContainer(), drawSettings, true, false);
+                } else if (newToggle == dashEllipseButton) {
+                    ShapeFeature.ellipseDraw(context.canvasContainer(), drawSettings, false, true);
+                }
+                //endregion
+                isSaved = false;
+            }
+        });
 
-            else if (newToggle == triangleButton) {ShapeFeature.triangleDraw(canvasContainer, drawSettings, false, false);}
-            else if (newToggle == fillTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, drawSettings, true, false);}
-            else if (newToggle == dashTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, drawSettings, false, true);}
-
-            else if (newToggle == circleButton) {ShapeFeature.circleDraw(canvasContainer, drawSettings, false, false);}
-            else if (newToggle == fillCircleButton) {ShapeFeature.circleDraw(canvasContainer, drawSettings, true, false);}
-            else if (newToggle == dashCircleButton) {ShapeFeature.circleDraw(canvasContainer, drawSettings, false, true);}
-
-            else if (newToggle == ellipseButton) {ShapeFeature.ellipseDraw(canvasContainer, drawSettings, false, false);}
-            else if (newToggle == fillEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, drawSettings, true, false);}
-            else if (newToggle == dashEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, drawSettings, false, true);}
-
-            isSaved = false;
+        //Tab Features
+        addTab.setOnAction(event -> {
+            TabFeature.addTab(tabPane, drawSettings);
         });
 
         //Help Popup
@@ -238,16 +268,21 @@ public class PaintApplication extends Application {
 
         //Close Intercept
         primaryStage.setOnCloseRequest(event -> {
-            WritableImage combineImage = combineArea.snapshot(null,null);
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                WritableImage combineImage = context.combineArea().snapshot(null, null);
 
-            CloseInterceptFeature.handleExit(event, combineImage);
+                CloseInterceptFeature.handleExit(event, combineImage);
+            }
         });
 
         //MAIN LAYOUT
         BorderPane root = new BorderPane();
         root.setTop(menuBar);
         root.setRight(sideMenu);
-        root.setCenter(imagePane);
+        root.setCenter(tabPane);
+
+        TabFeature.addTab(tabPane, drawSettings);
 
         //SHOWTIME
         Scene scene = new Scene(root, 1150, 650);

@@ -13,7 +13,7 @@ public class DrawSettings extends VBox {
     private final Robot colorGrab;
     private final ToggleButton grabberButton;
 
-    public DrawSettings(GraphicsContext gc) {
+    public DrawSettings() {
         this.setSpacing(10);
         this.setStyle("-fx-padding: 5; -fx-background-color: #c5c7ca;");
 
@@ -34,16 +34,6 @@ public class DrawSettings extends VBox {
 
         sizeSlider = new Slider(0, 50, 5);
         sizeSlider.setShowTickLabels(true);
-
-        //Give Brush Int & Color Hex
-        sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            gc.setLineWidth(newValue.doubleValue());
-        });
-
-        colorPicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            gc.setFill(newValue);
-            gc.setStroke(newValue);
-        });
 
         this.getChildren().addAll(
                 colorLabel, colorPicker,

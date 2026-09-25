@@ -5,6 +5,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
@@ -15,6 +16,7 @@ public class ShapeFeature {
     private static Rectangle rectangle;
     private static Polygon triangle;
     private static Circle circle;
+    private static Ellipse ellipse;
 
     public static void rectDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
                                 Boolean filled, Boolean dashed, Boolean square) {
@@ -72,7 +74,8 @@ public class ShapeFeature {
         canvas.setOnMouseReleased(event -> {rectangle = null;});
     }
 
-    public static void triangleDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider, Boolean filled, Boolean dashed) {
+    public static void triangleDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+                                    Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
             startY = event.getY();
@@ -118,7 +121,8 @@ public class ShapeFeature {
         canvas.setOnMouseReleased(event -> {triangle = null;});
     }
 
-    public static void circleDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider, Boolean filled, Boolean dashed) {
+    public static void circleDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+                                  Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
             startY = event.getY();
@@ -150,6 +154,52 @@ public class ShapeFeature {
         });
 
         canvas.setOnMouseReleased(event -> {circle = null;});
+    }
+
+    public static void ellipseDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+                                   Boolean filled, Boolean dashed) {
+        canvas.setOnMousePressed( event -> {
+            startX = event.getX();
+            startY = event.getY();
+
+            ellipse = new Ellipse(startX, startY, 0, 0);
+
+            if(filled) {ellipse.setFill(colorPicker.getValue());}
+            else {ellipse.setFill(Color.TRANSPARENT);}
+
+            ellipse.setStroke(colorPicker.getValue());
+            ellipse.setStrokeWidth(sizeSlider.getValue());
+
+            if (dashed) {
+                double lineWidth = sizeSlider.getValue();
+                ellipse.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
+            }
+
+            canvas.getChildren().add(ellipse);
+        });
+
+        canvas.setOnMouseDragged(event -> {
+            if (ellipse == null) return;
+
+            else {
+                double currentX = event.getX();
+                double currentY = event.getY();
+
+                double radiusX = Math.abs(currentX - startX) / 2.0;
+                double radiusY = Math.abs(currentY - startY) / 2.0;
+
+                double centerX = startX + (currentX >= startX ? radiusX : -radiusX);
+                double centerY = startY + (currentY >= startY ? radiusY : -radiusY);
+
+                ellipse.setCenterX(centerX);
+                ellipse.setCenterY(centerY);
+
+                ellipse.setRadiusX(radiusX);
+                ellipse.setRadiusY(radiusY);
+            }
+        });
+
+        canvas.setOnMouseReleased(event -> ellipse = null);
     }
 }
 

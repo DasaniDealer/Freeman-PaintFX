@@ -64,19 +64,25 @@ public class PaintApplication extends Application {
         RadioMenuItem dashSquareButton = new RadioMenuItem("Dashed Square");
         RadioMenuItem rectButton = new RadioMenuItem("Rectangle");
         RadioMenuItem dashRectButton = new RadioMenuItem("Dashed Rectangle");
+
         RadioMenuItem triangleButton = new RadioMenuItem("Triangle");
         RadioMenuItem dashTriangleButton = new RadioMenuItem("Dashed Triangle");
+
         RadioMenuItem circleButton = new RadioMenuItem("Circle");
         RadioMenuItem dashCircleButton = new RadioMenuItem("Dashed Circle");
+        RadioMenuItem ellipseButton = new RadioMenuItem("Ellipse");
+        RadioMenuItem dashEllipseButton = new RadioMenuItem("Dashed Ellipse");
 
         RadioMenuItem fillSquareButton = new RadioMenuItem("Filled Square");
         RadioMenuItem fillRectButton = new RadioMenuItem("Filled Rectangle");
         RadioMenuItem fillTriangleButton = new RadioMenuItem("Filled Triangle");
         RadioMenuItem fillCircleButton = new RadioMenuItem("Filled Circle");
+        RadioMenuItem fillEllipseButton = new RadioMenuItem("Filled Ellipse");
 
         //Menu Groups
         MenuButton lineMenu = new MenuButton("Line");
         MenuButton shapeMenu = new MenuButton("Shape");
+        MenuButton dashMenu = new MenuButton("Dashed Shape");
         MenuButton fillShapeMenu = new MenuButton("Filled Shape");
 
         //Toggle Groups
@@ -93,10 +99,14 @@ public class PaintApplication extends Application {
         dashSquareButton.setToggleGroup(shapeToggle);
         rectButton.setToggleGroup(shapeToggle);
         dashRectButton.setToggleGroup(shapeToggle);
+
         triangleButton.setToggleGroup(shapeToggle);
         dashTriangleButton.setToggleGroup(shapeToggle);
+
         circleButton.setToggleGroup(shapeToggle);
         dashCircleButton.setToggleGroup(shapeToggle);
+        ellipseButton.setToggleGroup(shapeToggle);
+        dashEllipseButton.setToggleGroup(shapeToggle);
         //Fill Shape Menu
         fillSquareButton.setToggleGroup(shapeToggle);
         fillRectButton.setToggleGroup(shapeToggle);
@@ -117,14 +127,15 @@ public class PaintApplication extends Application {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, pencilButton, lineMenu, shapeMenu, fillShapeMenu, eraserButton,
+                toolsLabel, pencilButton, lineMenu, shapeMenu, dashMenu, fillShapeMenu, eraserButton,
                 colorLabel, colorPicker,
                 sizeLabel, sizeSlider
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
-        shapeMenu.getItems().addAll(squareButton, dashSquareButton, rectButton, dashRectButton, triangleButton, dashTriangleButton, circleButton, dashCircleButton);
-        fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillCircleButton);
+        shapeMenu.getItems().addAll(squareButton, rectButton, triangleButton, circleButton, ellipseButton);
+        dashMenu.getItems().addAll(dashSquareButton, dashRectButton, dashTriangleButton, dashCircleButton, dashEllipseButton);
+        fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillCircleButton, fillEllipseButton);
 
         //Image & Canvas Create
         ImageView imageView = new ImageView();
@@ -248,6 +259,10 @@ public class PaintApplication extends Application {
             else if (newToggle == circleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
             else if (newToggle == fillCircleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
             else if (newToggle == dashCircleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
+
+            else if (newToggle == ellipseButton) {ShapeFeature.ellipseDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
+            else if (newToggle == fillEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
+            else if (newToggle == dashEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
 
             isSaved = false;
         });

@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
@@ -15,11 +14,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import java.io.File;
+
 import java.io.IOException;
 
 public class PaintApplication extends Application {
@@ -29,6 +26,36 @@ public class PaintApplication extends Application {
     public void start(Stage primaryStage) throws IOException {
 
         primaryStage.setTitle("(Pain)t");
+
+        //Image & Canvas Create
+        ImageView imageView = new ImageView();
+        imageView.setPreserveRatio(true);
+
+        Pane canvasContainer = new Pane();
+
+        Canvas canvas = new Canvas(1150, 650);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        canvasContainer.getChildren().addAll(canvas);
+
+        DrawSettings drawSettings = new DrawSettings(gc);
+        ToggleButton grabButton = drawSettings.getGrabButton();
+
+        //Connect Canvas to Container
+        canvas.widthProperty().bind(canvasContainer.widthProperty());
+        canvas.heightProperty().bind(canvasContainer.heightProperty());
+
+        canvas.widthProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, oldInt.doubleValue(), canvas.getHeight()));
+        canvas.heightProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, canvas.getWidth(), oldInt.doubleValue()));
+
+        //Image and Canvas Stack
+        StackPane combineArea = new StackPane(imageView, canvasContainer);
+
+        ScrollPane imagePane = new ScrollPane(combineArea);
+        imagePane.setPannable(false);
+        imagePane.setFitToWidth(true);
+        imagePane.setFitToHeight(true);
+        imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);;
 
         //Menu Bar
         MenuBar menuBar = new MenuBar();
@@ -57,11 +84,10 @@ public class PaintApplication extends Application {
         Label toolsLabel = new Label("Tools");
         toolsLabel.setStyle("-fx-font-weight: bold;");
         ToggleButton pencilButton = new ToggleButton("Pencil");
+        ToggleButton eraserButton = new ToggleButton("Eraser");
 
         RadioMenuItem lineButton = new RadioMenuItem("Line");
         RadioMenuItem dashButton = new RadioMenuItem("Dashed");
-
-        ToggleButton eraserButton = new ToggleButton("Eraser");
 
         RadioMenuItem squareButton = new RadioMenuItem("Square");
         RadioMenuItem dashSquareButton = new RadioMenuItem("Dashed Square");
@@ -90,93 +116,28 @@ public class PaintApplication extends Application {
 
         //Toggle Groups
         ToggleGroup toolToggle = new ToggleGroup();
-        pencilButton.setToggleGroup(toolToggle);
-
         ToggleGroup lineToggle = new ToggleGroup();
-        lineButton.setToggleGroup(lineToggle);
-        dashButton.setToggleGroup(lineToggle);
-
         ToggleGroup shapeToggle = new ToggleGroup();
+
+        toolToggle.getToggles().addAll(pencilButton, eraserButton, grabButton);
+        lineToggle.getToggles().addAll(lineButton, dashButton);
         //Shape Menu
-        squareButton.setToggleGroup(shapeToggle);
-        dashSquareButton.setToggleGroup(shapeToggle);
-        rectButton.setToggleGroup(shapeToggle);
-        dashRectButton.setToggleGroup(shapeToggle);
-
-        triangleButton.setToggleGroup(shapeToggle);
-        dashTriangleButton.setToggleGroup(shapeToggle);
-
-        circleButton.setToggleGroup(shapeToggle);
-        dashCircleButton.setToggleGroup(shapeToggle);
-        ellipseButton.setToggleGroup(shapeToggle);
-        dashEllipseButton.setToggleGroup(shapeToggle);
-        //Fill Shape Menu
-        fillSquareButton.setToggleGroup(shapeToggle);
-        fillRectButton.setToggleGroup(shapeToggle);
-        fillTriangleButton.setToggleGroup(shapeToggle);
-        fillCircleButton.setToggleGroup(shapeToggle);
-        fillEllipseButton.setToggleGroup(shapeToggle);
-
-        //Colours
-        Label colorLabel = new Label("Colour");
-        colorLabel.setStyle("-fx-font-weight: bold;");
-        ColorPicker colorPicker = new ColorPicker();
-        colorPicker.setValue(Color.web("#000000"));
-
-        //Brush Size
-        Label sizeLabel = new Label("Brush Size");
-        sizeLabel.setStyle("-fx-font-weight: bold;");
-        Slider sizeSlider = new Slider(1, 50, 5);
-        sizeSlider.setShowTickLabels(true);
+        shapeToggle.getToggles().addAll(squareButton, dashSquareButton, fillSquareButton,
+                rectButton, dashRectButton, fillRectButton,
+                triangleButton, dashTriangleButton, fillTriangleButton,
+                circleButton, dashCircleButton, fillCircleButton,
+                ellipseButton, dashEllipseButton, fillEllipseButton);
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
                 toolsLabel, pencilButton, lineMenu, shapeMenu, dashMenu, fillShapeMenu, eraserButton,
-                colorLabel, colorPicker,
-                sizeLabel, sizeSlider
+                drawSettings
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
         shapeMenu.getItems().addAll(squareButton, rectButton, triangleButton, circleButton, ellipseButton);
         dashMenu.getItems().addAll(dashSquareButton, dashRectButton, dashTriangleButton, dashCircleButton, dashEllipseButton);
         fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillCircleButton, fillEllipseButton);
-
-        //Image & Canvas Create
-        ImageView imageView = new ImageView();
-        imageView.setPreserveRatio(true);
-
-        Pane canvasContainer = new Pane();
-
-        Canvas canvas = new Canvas(1150, 650);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        canvasContainer.getChildren().addAll(canvas);
-
-        //Connect Canvas to Container
-        canvas.widthProperty().bind(canvasContainer.widthProperty());
-        canvas.heightProperty().bind(canvasContainer.heightProperty());
-
-        canvas.widthProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, oldInt.doubleValue(), canvas.getHeight()));
-        canvas.heightProperty().addListener((obs, oldInt, newInt) -> CanvasFeature.canvasResize(canvas, gc, canvas.getWidth(), oldInt.doubleValue()));
-
-        //Image and Canvas Stack
-        StackPane combineArea = new StackPane(imageView, canvasContainer);
-
-        ScrollPane imagePane = new ScrollPane(combineArea);
-        imagePane.setPannable(false);
-        imagePane.setFitToWidth(true);
-        imagePane.setFitToHeight(true);
-        imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);;
-
-        //Give Brush Int & Color Hex
-        sizeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            gc.setLineWidth(newValue.doubleValue());
-        });
-
-        colorPicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            gc.setFill(newValue);
-            gc.setStroke(newValue);
-        });
 
         //Open Image
         openImage.setOnAction(event -> {OpenFeature.open(imageView, primaryStage, gc, canvas, canvasContainer);});
@@ -206,13 +167,13 @@ public class PaintApplication extends Application {
             if (newToggle == null) {return;}
 
             //Unselect Dropdown Items
-            if (newToggle == pencilButton) {
-                lineToggle.selectToggle(null);
-                shapeToggle.selectToggle(null);
-            }
+            lineToggle.selectToggle(null);
+            shapeToggle.selectToggle(null);
 
             //Toggle Button Effects
-            if (newToggle == pencilButton) {CanvasFeature.drawLine(canvasContainer, colorPicker, sizeSlider);}
+            if (newToggle == pencilButton) {CanvasFeature.drawLine(canvasContainer, drawSettings);}
+
+            if (newToggle == grabButton) {CanvasFeature.grabColor(canvasContainer, drawSettings, toolToggle);}
 
             isSaved = false;
         });
@@ -228,8 +189,8 @@ public class PaintApplication extends Application {
             toolToggle.selectToggle(null);
             shapeToggle.selectToggle(null);
             //Toggle Button Effects
-            if (newToggle == lineButton) {CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, false);}
-            else if (newToggle == dashButton) {CanvasFeature.drawStraight(canvasContainer, colorPicker, sizeSlider, true);}
+            if (newToggle == lineButton) {CanvasFeature.drawStraight(canvasContainer, drawSettings, false);}
+            else if (newToggle == dashButton) {CanvasFeature.drawStraight(canvasContainer, drawSettings, true);}
 
             isSaved = false;
         });
@@ -245,25 +206,25 @@ public class PaintApplication extends Application {
             toolToggle.selectToggle(null);
             lineToggle.selectToggle(null);
             //Toggle Button Effects
-            if (newToggle == squareButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, false, true);}
-            else if (newToggle == fillSquareButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, true, false, true);}
-            else if (newToggle == dashSquareButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, true, true);}
+            if (newToggle == squareButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, false, true);}
+            else if (newToggle == fillSquareButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, true, false, true);}
+            else if (newToggle == dashSquareButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, true, true);}
 
-            if (newToggle == rectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, false, false);}
-            else if (newToggle == fillRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, true, false, false);}
-            else if (newToggle == dashRectButton) {ShapeFeature.rectDraw(canvasContainer, colorPicker, sizeSlider, false, true, false);}
+            if (newToggle == rectButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, false, false);}
+            else if (newToggle == fillRectButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, true, false, false);}
+            else if (newToggle == dashRectButton) {ShapeFeature.rectDraw(canvasContainer, drawSettings, false, true, false);}
 
-            else if (newToggle == triangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
-            else if (newToggle == fillTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
-            else if (newToggle == dashTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
+            else if (newToggle == triangleButton) {ShapeFeature.triangleDraw(canvasContainer, drawSettings, false, false);}
+            else if (newToggle == fillTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, drawSettings, true, false);}
+            else if (newToggle == dashTriangleButton) {ShapeFeature.triangleDraw(canvasContainer, drawSettings, false, true);}
 
-            else if (newToggle == circleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
-            else if (newToggle == fillCircleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
-            else if (newToggle == dashCircleButton) {ShapeFeature.circleDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
+            else if (newToggle == circleButton) {ShapeFeature.circleDraw(canvasContainer, drawSettings, false, false);}
+            else if (newToggle == fillCircleButton) {ShapeFeature.circleDraw(canvasContainer, drawSettings, true, false);}
+            else if (newToggle == dashCircleButton) {ShapeFeature.circleDraw(canvasContainer, drawSettings, false, true);}
 
-            else if (newToggle == ellipseButton) {ShapeFeature.ellipseDraw(canvasContainer, colorPicker, sizeSlider, false, false);}
-            else if (newToggle == fillEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, colorPicker, sizeSlider, true, false);}
-            else if (newToggle == dashEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, colorPicker, sizeSlider, false, true);}
+            else if (newToggle == ellipseButton) {ShapeFeature.ellipseDraw(canvasContainer, drawSettings, false, false);}
+            else if (newToggle == fillEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, drawSettings, true, false);}
+            else if (newToggle == dashEllipseButton) {ShapeFeature.ellipseDraw(canvasContainer, drawSettings, false, true);}
 
             isSaved = false;
         });

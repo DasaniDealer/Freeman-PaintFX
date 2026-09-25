@@ -2,8 +2,7 @@ package com.paintfx.freemanpaintfx;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Slider;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -16,12 +15,12 @@ public class CanvasFeature {
     static Line line;
 
     //Mouse Free Draw
-    static void drawLine(Pane canvas, ColorPicker color, Slider size) {
+    static void drawLine(Pane canvas, DrawSettings drawSettings) {
         canvas.setOnMousePressed(event -> {
             path = new Path();
             //Path Settings
-            path.setStroke(color.getValue());
-            path.setStrokeWidth(size.getValue());
+            path.setStroke(drawSettings.getColor());
+            path.setStrokeWidth(drawSettings.getSize());
             path.setStrokeLineCap(StrokeLineCap.ROUND);
             path.setStrokeLineJoin(StrokeLineJoin.ROUND);
 
@@ -39,7 +38,7 @@ public class CanvasFeature {
     }
 
     //Straight Line Draw
-    static void drawStraight(Pane canvas, ColorPicker color, Slider size, Boolean dashed) {
+    static void drawStraight(Pane canvas, DrawSettings drawSettings, Boolean dashed) {
 
         canvas.setOnMousePressed(event -> {
             startX = event.getX();
@@ -47,12 +46,12 @@ public class CanvasFeature {
 
             line = new Line(startX,startY,startX,startY);
 
-            line.setStroke(color.getValue());
-            line.setStrokeWidth(size.getValue());
+            line.setStroke(drawSettings.getColor());
+            line.setStrokeWidth(drawSettings.getSize());
             line.setStrokeLineCap(StrokeLineCap.ROUND);
             //Dash Boolean
             if (dashed) {
-                double lineWidth = size.getValue();
+                double lineWidth = drawSettings.getSize();
                 line.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
             }
 
@@ -67,6 +66,25 @@ public class CanvasFeature {
         });
 
         canvas.setOnMouseReleased(event -> {line = null;});
+    }
+
+    static void grabColor(Pane canvas, DrawSettings drawSettings, ToggleGroup toolToggle) {
+        canvas.setCursor(javafx.scene.Cursor.CROSSHAIR);
+
+        canvas.setOnMouseClicked(event -> {
+            //Pick Colour
+            double x = event.getScreenX();
+            double y = event.getScreenY();
+            Color pickedColor = drawSettings.getColorGrab().getPixelColor(x, y);
+
+            drawSettings.getColorPicker().setValue(pickedColor);
+
+            //Untoggle
+            canvas.setCursor(javafx.scene.Cursor.DEFAULT);
+            canvas.setOnMouseClicked(null);
+
+            toolToggle.selectToggle(null);
+        });
     }
 
     //Canvas Resizing

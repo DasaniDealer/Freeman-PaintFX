@@ -18,7 +18,7 @@ public class ShapeFeature {
     private static Circle circle;
     private static Ellipse ellipse;
 
-    public static void rectDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+    public static void rectDraw(Pane canvas, DrawSettings drawSettings,
                                 Boolean filled, Boolean dashed, Boolean square) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
@@ -28,14 +28,14 @@ public class ShapeFeature {
             rectangle.setX(startX);
             rectangle.setY(startY);
 
-            if(filled) {rectangle.setFill(colorPicker.getValue());}
+            if(filled) {rectangle.setFill(drawSettings.getColor());}
             else {rectangle.setFill(Color.TRANSPARENT);}
 
-            rectangle.setStroke(colorPicker.getValue());
-            rectangle.setStrokeWidth(sizeSlider.getValue());
+            rectangle.setStroke(drawSettings.getColor());
+            rectangle.setStrokeWidth(drawSettings.getSize());
 
             if (dashed) {
-                double lineWidth = sizeSlider.getValue();
+                double lineWidth = drawSettings.getSize();
                 rectangle.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
             }
 
@@ -74,7 +74,7 @@ public class ShapeFeature {
         canvas.setOnMouseReleased(event -> {rectangle = null;});
     }
 
-    public static void triangleDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+    public static void triangleDraw(Pane canvas, DrawSettings drawSettings,
                                     Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
@@ -82,14 +82,14 @@ public class ShapeFeature {
 
             triangle = new Polygon();
 
-            if(filled) {triangle.setFill(colorPicker.getValue());}
+            if(filled) {triangle.setFill(drawSettings.getColor());}
             else {triangle.setFill(Color.TRANSPARENT);}
 
-            triangle.setStroke(colorPicker.getValue());
-            triangle.setStrokeWidth(sizeSlider.getValue());
+            triangle.setStroke(drawSettings.getColor());
+            triangle.setStrokeWidth(drawSettings.getSize());
 
             if (dashed) {
-                double lineWidth = sizeSlider.getValue();
+                double lineWidth = drawSettings.getSize();
                 triangle.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
             }
 
@@ -121,7 +121,7 @@ public class ShapeFeature {
         canvas.setOnMouseReleased(event -> {triangle = null;});
     }
 
-    public static void circleDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+    public static void circleDraw(Pane canvas, DrawSettings drawSettings,
                                   Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
@@ -129,14 +129,14 @@ public class ShapeFeature {
 
             circle = new Circle(startX, startY, 0);
 
-            if(filled) {circle.setFill(colorPicker.getValue());}
+            if(filled) {circle.setFill(drawSettings.getColor());}
             else {circle.setFill(Color.TRANSPARENT);}
 
-            circle.setStroke(colorPicker.getValue());
-            circle.setStrokeWidth(sizeSlider.getValue());
+            circle.setStroke(drawSettings.getColor());
+            circle.setStrokeWidth(drawSettings.getSize());
 
             if (dashed) {
-                double lineWidth = sizeSlider.getValue();
+                double lineWidth = drawSettings.getSize();
                 circle.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
             }
 
@@ -156,7 +156,7 @@ public class ShapeFeature {
         canvas.setOnMouseReleased(event -> {circle = null;});
     }
 
-    public static void ellipseDraw(Pane canvas, ColorPicker colorPicker, Slider sizeSlider,
+    public static void ellipseDraw(Pane canvas, DrawSettings drawSettings,
                                    Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
             startX = event.getX();
@@ -164,14 +164,14 @@ public class ShapeFeature {
 
             ellipse = new Ellipse(startX, startY, 0, 0);
 
-            if(filled) {ellipse.setFill(colorPicker.getValue());}
+            if(filled) {ellipse.setFill(drawSettings.getColor());}
             else {ellipse.setFill(Color.TRANSPARENT);}
 
-            ellipse.setStroke(colorPicker.getValue());
-            ellipse.setStrokeWidth(sizeSlider.getValue());
+            ellipse.setStroke(drawSettings.getColor());
+            ellipse.setStrokeWidth(drawSettings.getSize());
 
             if (dashed) {
-                double lineWidth = sizeSlider.getValue();
+                double lineWidth = drawSettings.getSize();
                 ellipse.getStrokeDashArray().addAll(3 * lineWidth, 2 * lineWidth);
             }
 

@@ -1,7 +1,5 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Slider;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;

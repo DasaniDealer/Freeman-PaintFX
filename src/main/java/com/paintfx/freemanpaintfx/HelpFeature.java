@@ -13,7 +13,7 @@ public class HelpFeature {
         popupRoot.setAlignment(Pos.CENTER);
         popupRoot.setStyle("-fx-padding: 15; " + "-fx-background-color: #D3D3D3;");
 
-        Label titleLabel = new Label("Freeman PaintFX v2.6.0");
+        Label titleLabel = new Label("Freeman PaintFX v4.0.0");
         titleLabel.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 24px;");
 
         Label descriptionLabel = new Label("Previous Versions: https://github.com/DasaniDealer/Freeman-PaintFX");
@@ -23,7 +23,7 @@ public class HelpFeature {
 
         //Close Button
         Button closeButton = new Button("Close");
-        closeButton.setOnAction(e -> helpPopup.hide());
+        closeButton.setOnAction(event -> helpPopup.hide());
 
         //Layout
         popupRoot.getChildren().addAll(titleLabel, descriptionLabel, closeButton);

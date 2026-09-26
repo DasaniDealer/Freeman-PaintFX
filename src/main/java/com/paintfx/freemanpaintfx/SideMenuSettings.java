@@ -1,6 +1,5 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 

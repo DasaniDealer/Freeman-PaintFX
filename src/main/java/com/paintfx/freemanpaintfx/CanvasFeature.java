@@ -8,6 +8,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 
+/**
+ * Handles Canvas interactions, including
+ * free draw, line draw, color picking, and canvas resizing
+ * <p>
+ */
 public class CanvasFeature {
     static double startX, startY;
     //Object Initialization

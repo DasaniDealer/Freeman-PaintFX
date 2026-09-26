@@ -78,4 +78,3 @@ public class SaveFeature {
         currentFile = file;
     }
 }
-

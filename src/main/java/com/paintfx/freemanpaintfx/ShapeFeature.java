@@ -200,7 +200,3 @@ public class ShapeFeature {
         canvas.setOnMouseReleased(event -> ellipse = null);
     }
 }
-
-
-
-

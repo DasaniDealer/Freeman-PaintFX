@@ -74,7 +74,7 @@ public class MenuSettings extends MenuBar{
         helpAct.setOnAction(event -> {
             Popup helpPopup = new Popup();
 
-            HelpFeature.handleHelp(helpPopup, primaryStage);
+            MenuHandles.handleHelp(helpPopup, primaryStage);
         });
 
         //Close Intercept
@@ -83,7 +83,7 @@ public class MenuSettings extends MenuBar{
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
                 WritableImage combineImage = context.combineArea().snapshot(null, null);
 
-                CloseInterceptFeature.handleExit(event, combineImage);
+                MenuHandles.handleExit(event, combineImage);
             }
         });
     }

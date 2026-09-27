@@ -33,9 +33,7 @@ public class PaintApplication extends Application {
         TabPane tabPane = new TabPane();
 
         MenuSettings menuBar = new MenuSettings(primaryStage, tabPane, drawSettings);
-
         BorderPane root = new BorderPane();
-
         SideMenuSettings sideMenu = new SideMenuSettings(tabPane, drawSettings);
 
         root.setTop(menuBar);

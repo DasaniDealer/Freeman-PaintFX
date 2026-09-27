@@ -38,6 +38,7 @@ public class TabFeature {
         StackPane combineArea = new StackPane(imageView, canvasContainer);
 
         ScrollPane imagePane = new ScrollPane(combineArea);
+
         imagePane.setPannable(false);
         imagePane.setFitToWidth(true);
         imagePane.setFitToHeight(true);

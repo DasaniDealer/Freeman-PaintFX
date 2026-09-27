@@ -60,6 +60,15 @@ public class SideMenuSettings {
                 circleButton, dashCircleButton, fillCircleButton,
                 ellipseButton, dashEllipseButton, fillEllipseButton);
 
+        //Clear Button
+        Button clearButton = new Button("Clear Canvas");
+        clearButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                CanvasFeature.clearCanvas(context.canvasContainer(), event);
+            }
+        });
+
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 //Clear Toggles
@@ -77,7 +86,8 @@ public class SideMenuSettings {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, pencilButton, lineMenu, shapeMenu, dashMenu, fillShapeMenu, eraserButton,
+                toolsLabel, pencilButton, eraserButton, clearButton,
+                lineMenu, shapeMenu, dashMenu, fillShapeMenu,
                 drawSettings
         );
 

@@ -1,12 +1,17 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+
+import java.util.Optional;
 
 /**
  * Handles Canvas interactions, including
@@ -73,6 +78,7 @@ public class CanvasFeature {
         canvas.setOnMouseReleased(event -> {line = null;});
     }
 
+    //Color Grabber
     static void grabColor(Pane canvas, DrawSettings drawSettings, ToggleGroup toolToggle) {
         canvas.setCursor(javafx.scene.Cursor.CROSSHAIR);
 
@@ -90,6 +96,29 @@ public class CanvasFeature {
 
             toolToggle.selectToggle(null);
         });
+    }
+
+    static void clearCanvas(Pane canvas, ActionEvent event) {
+        Alert clearAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        clearAlert.setTitle("You Are About To Clear Canvas");
+        clearAlert.setContentText("Are You Sure?");
+
+        ButtonType buttonConfirm = new ButtonType("Confirm");
+        ButtonType buttonCancel = new ButtonType("Cancel");
+
+        clearAlert.getButtonTypes().setAll(buttonConfirm, buttonCancel);
+
+        //Button Choice
+        Optional<ButtonType> result = clearAlert.showAndWait();
+
+        if(result.isPresent()) {
+            if(result.get() == buttonConfirm) {
+                canvas.getChildren().clear();
+            }
+            else {
+                event.consume();
+            }
+        }
     }
 
     //Canvas Resizing

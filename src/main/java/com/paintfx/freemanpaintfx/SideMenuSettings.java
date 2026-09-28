@@ -135,9 +135,9 @@ public class SideMenuSettings {
                 shapeToggle.selectToggle(null);
                 //Toggle Button Effects
                 if (newToggle == lineButton) {
-                    CanvasFeature.drawStraight(context.canvasContainer(), drawSettings, false);
+                    CanvasFeature.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, false);
                 } else if (newToggle == dashButton) {
-                    CanvasFeature.drawStraight(context.canvasContainer(), drawSettings, true);
+                    CanvasFeature.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, true);
                 }
 
                 isSaved = false;
@@ -203,19 +203,6 @@ public class SideMenuSettings {
                 isSaved = false;
             }
         });
-    }
-
-    private static void applySettings(GraphicsContext gc, DrawSettings drawSettings, boolean dashed) {
-        gc.setStroke(drawSettings.getColor());
-        gc.setLineWidth(drawSettings.getSize());
-        gc.setLineCap(StrokeLineCap.ROUND);
-
-        if (dashed) {
-            double lineWidth = drawSettings.getSize();
-            gc.setLineDashes(3 * lineWidth, 2 * lineWidth);
-        } else {
-            gc.setLineDashes((double[]) null); // Resets back to a solid line
-        }
     }
 
     public VBox getView() {return sideMenu;}

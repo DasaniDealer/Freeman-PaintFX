@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.StrokeLineCap;
 
 public class TabFeature {
     private static int tabCount = 0;
@@ -23,18 +24,28 @@ public class TabFeature {
 
         Canvas mainCanvas = new Canvas(1150, 650);
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
-        canvasContainer.getChildren().addAll(mainCanvas);
 
         Canvas prevCanvas = new Canvas(1150, 650);
+        GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
+
+        canvasContainer.getChildren().addAll(mainCanvas,prevCanvas);
 
         //Connect Canvas to Container
         mainCanvas.widthProperty().bind(canvasContainer.widthProperty());
         mainCanvas.heightProperty().bind(canvasContainer.heightProperty());
 
-        mainCanvas.widthProperty().addListener((obs, oldInt, newInt) ->
-                CanvasFeature.canvasResize(mainCanvas, gc, oldInt.doubleValue(), mainCanvas.getHeight()));
-        mainCanvas.heightProperty().addListener((obs, oldInt, newInt) ->
-                CanvasFeature.canvasResize(mainCanvas, gc, mainCanvas.getWidth(), oldInt.doubleValue()));
+        prevCanvas.widthProperty().bind(canvasContainer.widthProperty());
+        prevCanvas.heightProperty().bind(canvasContainer.heightProperty());
+
+        canvasContainer.widthProperty().addListener((obs, oldW, newW) -> {
+            CanvasFeature.canvasResize(mainCanvas, gc, oldW.doubleValue(), canvasContainer.getHeight());
+            CanvasFeature.canvasResize(prevCanvas, pgc, oldW.doubleValue(), canvasContainer.getHeight());
+        });
+
+        canvasContainer.heightProperty().addListener((obs, oldH, newH) -> {
+            CanvasFeature.canvasResize(mainCanvas, gc, canvasContainer.getWidth(), oldH.doubleValue());
+            CanvasFeature.canvasResize(prevCanvas, pgc, canvasContainer.getWidth(), oldH.doubleValue());
+        });
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);
@@ -53,6 +64,7 @@ public class TabFeature {
                 prevCanvas,
                 canvasContainer,
                 gc,
+                pgc,
                 combineArea
         ));
 
@@ -61,12 +73,26 @@ public class TabFeature {
         tabPane.getSelectionModel().select(newTab);
     }
 
+    static void applySettings(GraphicsContext gc, DrawSettings drawSettings, boolean dashed) {
+        gc.setStroke(drawSettings.getColor());
+        gc.setLineWidth(drawSettings.getSize());
+        gc.setLineCap(StrokeLineCap.ROUND);
+
+        if (dashed) {
+            double lineWidth = drawSettings.getSize();
+            gc.setLineDashes(3 * lineWidth, 2 * lineWidth);
+        } else {
+            gc.setLineDashes((double[]) null);
+        }
+    }
+
     public record TabRecord(
             ImageView imageView,
             Canvas mainCanvas,
-            Canvas prevCanvas
+            Canvas prevCanvas,
             Pane canvasContainer,
             GraphicsContext gc,
+            GraphicsContext pgc,
             StackPane combineArea
     ){}
 }

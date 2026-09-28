@@ -1,10 +1,12 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.StrokeLineCap;
 
 public class SideMenuSettings {
-    private VBox sideMenu;
+    private final VBox sideMenu;
     private boolean isSaved;
 
     public SideMenuSettings(TabPane tabPane, DrawSettings drawSettings) {
@@ -17,6 +19,7 @@ public class SideMenuSettings {
         toolsLabel.setStyle("-fx-font-weight: bold;");
         ToggleButton pencilButton = new ToggleButton("Pencil");
         ToggleButton eraserButton = new ToggleButton("Eraser");
+        Button clearButton = new Button("Clear Canvas");
 
         RadioMenuItem lineButton = new RadioMenuItem("Line");
         RadioMenuItem dashButton = new RadioMenuItem("Dashed");
@@ -59,15 +62,6 @@ public class SideMenuSettings {
                 triangleButton, dashTriangleButton, fillTriangleButton,
                 circleButton, dashCircleButton, fillCircleButton,
                 ellipseButton, dashEllipseButton, fillEllipseButton);
-
-        //Clear Button
-        Button clearButton = new Button("Clear Canvas");
-        clearButton.setOnAction(event -> {
-            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
-            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                CanvasFeature.clearCanvas(context.canvasContainer(), event);
-            }
-        });
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
@@ -114,9 +108,11 @@ public class SideMenuSettings {
 
                 //Toggle Button Effects
                 if (newToggle == pencilButton) {
-                    CanvasFeature.drawLine(context.canvasContainer(), drawSettings);
+                    CanvasFeature.drawLine(context.canvasContainer(), drawSettings, context.gc());
                 }
-
+                if (newToggle == eraserButton) {
+                    CanvasFeature.eraserTool(context.canvasContainer(), drawSettings, context.gc());
+                }
                 if (newToggle == grabButton) {
                     CanvasFeature.grabColor(context.canvasContainer(), drawSettings, toolToggle);
                 }
@@ -147,6 +143,15 @@ public class SideMenuSettings {
                 isSaved = false;
             }
         });
+
+        //Clear Button
+        clearButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                CanvasFeature.clearCanvas(context.canvasContainer(), event);
+            }
+        });
+
         //Shapes
         shapeToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
@@ -198,6 +203,19 @@ public class SideMenuSettings {
                 isSaved = false;
             }
         });
+    }
+
+    private static void applySettings(GraphicsContext gc, DrawSettings drawSettings, boolean dashed) {
+        gc.setStroke(drawSettings.getColor());
+        gc.setLineWidth(drawSettings.getSize());
+        gc.setLineCap(StrokeLineCap.ROUND);
+
+        if (dashed) {
+            double lineWidth = drawSettings.getSize();
+            gc.setLineDashes(3 * lineWidth, 2 * lineWidth);
+        } else {
+            gc.setLineDashes((double[]) null); // Resets back to a solid line
+        }
     }
 
     public VBox getView() {return sideMenu;}

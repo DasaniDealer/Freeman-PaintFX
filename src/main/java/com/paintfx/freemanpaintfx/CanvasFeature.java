@@ -21,30 +21,24 @@ import java.util.Optional;
 public class CanvasFeature {
     static double startX, startY;
     //Object Initialization
-    static Path path;
     static Line line;
 
     //Mouse Free Draw
-    static void drawLine(Pane canvas, DrawSettings drawSettings) {
+    static void drawLine(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
         canvas.setOnMousePressed(event -> {
-            path = new Path();
-            //Path Settings
-            path.setStroke(drawSettings.getColor());
-            path.setStrokeWidth(drawSettings.getSize());
-            path.setStrokeLineCap(StrokeLineCap.ROUND);
-            path.setStrokeLineJoin(StrokeLineJoin.ROUND);
+            gc.setStroke(drawSettings.getColor());
+            gc.setLineWidth(drawSettings.getSize());
+            gc.setLineCap(StrokeLineCap.ROUND);
+            gc.setLineJoin(StrokeLineJoin.ROUND);
 
-            path.getElements().add(new MoveTo(event.getX(), event.getY()));
-
-            canvas.getChildren().add(path);
+            gc.beginPath();
+            gc.moveTo(event.getX(), event.getY());
+            gc.stroke();
         });
         canvas.setOnMouseDragged(event -> {
-            if (path == null) {return;}
-
-            path.getElements().add(new LineTo(event.getX(), event.getY()));
+            gc.lineTo(event.getX(), event.getY());
+            gc.stroke();
         });
-
-        canvas.setOnMouseReleased(event -> {path = null;});
     }
 
     //Straight Line Draw
@@ -76,6 +70,23 @@ public class CanvasFeature {
         });
 
         canvas.setOnMouseReleased(event -> {line = null;});
+    }
+
+    static void eraserTool(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
+        canvas.setOnMousePressed(event -> {
+            clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
+        });
+
+        // Handle when the user drags the mouse to erase along a path
+        canvas.setOnMouseDragged(event -> {
+            clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
+        });
+    }
+
+    private static void clearPixelsAt(double x, double y, GraphicsContext gc, double brushSize) {
+        // Calculate Brush Size
+        double offset = brushSize / 2;
+        gc.clearRect(x - offset, y - offset, brushSize, brushSize);
     }
 
     //Color Grabber

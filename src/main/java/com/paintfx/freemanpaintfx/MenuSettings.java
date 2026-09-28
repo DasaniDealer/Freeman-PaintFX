@@ -38,7 +38,7 @@ public class MenuSettings extends MenuBar{
         openImage.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                OpenFeature.open(context.imageView(), primaryStage, context.gc(), context.canvas(), context.canvasContainer());
+                OpenFeature.open(context.imageView(), primaryStage, context.gc(), context.mainCanvas(), context.canvasContainer());
             }
         });
         openImage.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));

@@ -21,18 +21,20 @@ public class TabFeature {
 
         Pane canvasContainer = new Pane();
 
-        Canvas canvas = new Canvas(1150, 650);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        canvasContainer.getChildren().addAll(canvas);
+        Canvas mainCanvas = new Canvas(1150, 650);
+        GraphicsContext gc = mainCanvas.getGraphicsContext2D();
+        canvasContainer.getChildren().addAll(mainCanvas);
+
+        Canvas prevCanvas = new Canvas(1150, 650);
 
         //Connect Canvas to Container
-        canvas.widthProperty().bind(canvasContainer.widthProperty());
-        canvas.heightProperty().bind(canvasContainer.heightProperty());
+        mainCanvas.widthProperty().bind(canvasContainer.widthProperty());
+        mainCanvas.heightProperty().bind(canvasContainer.heightProperty());
 
-        canvas.widthProperty().addListener((obs, oldInt, newInt) ->
-                CanvasFeature.canvasResize(canvas, gc, oldInt.doubleValue(), canvas.getHeight()));
-        canvas.heightProperty().addListener((obs, oldInt, newInt) ->
-                CanvasFeature.canvasResize(canvas, gc, canvas.getWidth(), oldInt.doubleValue()));
+        mainCanvas.widthProperty().addListener((obs, oldInt, newInt) ->
+                CanvasFeature.canvasResize(mainCanvas, gc, oldInt.doubleValue(), mainCanvas.getHeight()));
+        mainCanvas.heightProperty().addListener((obs, oldInt, newInt) ->
+                CanvasFeature.canvasResize(mainCanvas, gc, mainCanvas.getWidth(), oldInt.doubleValue()));
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);
@@ -45,12 +47,26 @@ public class TabFeature {
         imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        newTab.setUserData(new TabRecord(imageView, canvas, canvasContainer, gc, combineArea));
+        newTab.setUserData(new TabRecord(
+                imageView,
+                mainCanvas,
+                prevCanvas,
+                canvasContainer,
+                gc,
+                combineArea
+        ));
 
         newTab.setContent(imagePane);
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
     }
 
-    public record TabRecord(ImageView imageView, Canvas canvas, Pane canvasContainer, GraphicsContext gc, StackPane combineArea) {}
+    public record TabRecord(
+            ImageView imageView,
+            Canvas mainCanvas,
+            Canvas prevCanvas
+            Pane canvasContainer,
+            GraphicsContext gc,
+            StackPane combineArea
+    ){}
 }

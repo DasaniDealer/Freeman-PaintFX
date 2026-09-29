@@ -1,9 +1,7 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.StrokeLineCap;
 
 public class SideMenuSettings {
     private final VBox sideMenu;
@@ -63,6 +61,7 @@ public class SideMenuSettings {
                 circleButton, dashCircleButton, fillCircleButton,
                 ellipseButton, dashEllipseButton, fillEllipseButton);
 
+        //Clear New Tab Listeners
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 //Clear Toggles
@@ -94,13 +93,8 @@ public class SideMenuSettings {
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                context.canvasContainer().setOnMousePressed(null);
-                context.canvasContainer().setOnMouseDragged(null);
-                context.canvasContainer().setOnMouseReleased(null);
-
-                if (newToggle == null) {
-                    return;
-                }
+                MiscHandles.clearListeners(context);
+                if (newToggle == null) {return;}
 
                 //Unselect Dropdown Items
                 lineToggle.selectToggle(null);
@@ -108,26 +102,25 @@ public class SideMenuSettings {
 
                 //Toggle Button Effects
                 if (newToggle == pencilButton) {
-                    CanvasFeature.drawLine(context.canvasContainer(), drawSettings, context.gc());
+                    SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc(), false);
                 }
                 if (newToggle == eraserButton) {
-                    CanvasFeature.eraserTool(context.canvasContainer(), drawSettings, context.gc());
+                    SideMenuHandles.eraserTool(context.canvasContainer(), drawSettings, context.gc(), false);
                 }
                 if (newToggle == grabButton) {
-                    CanvasFeature.grabColor(context.canvasContainer(), drawSettings, toolToggle);
+                    SideMenuHandles.grabColor(context.canvasContainer(), drawSettings, toolToggle);
                 }
 
                 isSaved = false;
             }
         });
+
         //Lines
         lineToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                context.canvasContainer().setOnMousePressed(null);
-                context.canvasContainer().setOnMouseDragged(null);
-                context.canvasContainer().setOnMouseReleased(null);
-
+                //Clear Canvas Mouse
+                MiscHandles.clearListeners(context);
                 if (newToggle == null) return;
 
                 //Unselect Main Menu Items
@@ -135,9 +128,9 @@ public class SideMenuSettings {
                 shapeToggle.selectToggle(null);
                 //Toggle Button Effects
                 if (newToggle == lineButton) {
-                    CanvasFeature.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, false);
+                    SideMenuHandles.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, false);
                 } else if (newToggle == dashButton) {
-                    CanvasFeature.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, true);
+                    SideMenuHandles.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, true);
                 }
 
                 isSaved = false;
@@ -148,7 +141,7 @@ public class SideMenuSettings {
         clearButton.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                CanvasFeature.clearCanvas(context.canvasContainer(), event);
+                SideMenuHandles.clearCanvas(context.canvasContainer(), event);
             }
         });
 
@@ -156,10 +149,7 @@ public class SideMenuSettings {
         shapeToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                context.canvasContainer().setOnMousePressed(null);
-                context.canvasContainer().setOnMouseDragged(null);
-                context.canvasContainer().setOnMouseReleased(null);
-
+                MiscHandles.clearListeners(context);
                 if (newToggle == null) return;
 
                 //Unselect Main Menu Items
@@ -167,37 +157,37 @@ public class SideMenuSettings {
                 lineToggle.selectToggle(null);
                 //region Toggle Button Effects
                 if (newToggle == squareButton) {
-                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, false, true);
+                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, false, true);
                 } else if (newToggle == fillSquareButton) {
-                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, true, false, true);
+                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, true, false, true);
                 } else if (newToggle == dashSquareButton) {
-                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, true, true);
+                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, true, true);
                 }
 
                 if (newToggle == rectButton) {
-                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, false, false);
+                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, false, false);
                 } else if (newToggle == fillRectButton) {
-                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, true, false, false);
+                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, true, false, false);
                 } else if (newToggle == dashRectButton) {
-                    ShapeFeature.rectDraw(context.canvasContainer(), drawSettings, false, true, false);
+                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, true, false);
                 } else if (newToggle == triangleButton) {
-                    ShapeFeature.triangleDraw(context.canvasContainer(), drawSettings, false, false);
+                    ShapeHandles.triangleDraw(context.canvasContainer(), drawSettings, false, false);
                 } else if (newToggle == fillTriangleButton) {
-                    ShapeFeature.triangleDraw(context.canvasContainer(), drawSettings, true, false);
+                    ShapeHandles.triangleDraw(context.canvasContainer(), drawSettings, true, false);
                 } else if (newToggle == dashTriangleButton) {
-                    ShapeFeature.triangleDraw(context.canvasContainer(), drawSettings, false, true);
+                    ShapeHandles.triangleDraw(context.canvasContainer(), drawSettings, false, true);
                 } else if (newToggle == circleButton) {
-                    ShapeFeature.circleDraw(context.canvasContainer(), drawSettings, false, false);
+                    ShapeHandles.circleDraw(context.canvasContainer(), drawSettings, false, false);
                 } else if (newToggle == fillCircleButton) {
-                    ShapeFeature.circleDraw(context.canvasContainer(), drawSettings, true, false);
+                    ShapeHandles.circleDraw(context.canvasContainer(), drawSettings, true, false);
                 } else if (newToggle == dashCircleButton) {
-                    ShapeFeature.circleDraw(context.canvasContainer(), drawSettings, false, true);
+                    ShapeHandles.circleDraw(context.canvasContainer(), drawSettings, false, true);
                 } else if (newToggle == ellipseButton) {
-                    ShapeFeature.ellipseDraw(context.canvasContainer(), drawSettings, false, false);
+                    ShapeHandles.ellipseDraw(context.canvasContainer(), drawSettings, false, false);
                 } else if (newToggle == fillEllipseButton) {
-                    ShapeFeature.ellipseDraw(context.canvasContainer(), drawSettings, true, false);
+                    ShapeHandles.ellipseDraw(context.canvasContainer(), drawSettings, true, false);
                 } else if (newToggle == dashEllipseButton) {
-                    ShapeFeature.ellipseDraw(context.canvasContainer(), drawSettings, false, true);
+                    ShapeHandles.ellipseDraw(context.canvasContainer(), drawSettings, false, true);
                 }
                 //endregion
                 isSaved = false;

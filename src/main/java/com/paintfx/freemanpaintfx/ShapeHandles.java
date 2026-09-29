@@ -7,7 +7,7 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
-public class ShapeFeature {
+public class ShapeHandles {
     private static double startX;
     private static double startY;
 
@@ -16,6 +16,7 @@ public class ShapeFeature {
     private static Circle circle;
     private static Ellipse ellipse;
 
+    //Square & Rectangle Function
     public static void rectDraw(Pane canvas, DrawSettings drawSettings,
                                 Boolean filled, Boolean dashed, Boolean square) {
         canvas.setOnMousePressed( event -> {
@@ -71,7 +72,7 @@ public class ShapeFeature {
 
         canvas.setOnMouseReleased(event -> {rectangle = null;});
     }
-
+    //Triangle Function
     public static void triangleDraw(Pane canvas, DrawSettings drawSettings,
                                     Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
@@ -118,7 +119,7 @@ public class ShapeFeature {
 
         canvas.setOnMouseReleased(event -> {triangle = null;});
     }
-
+    //Circle Function
     public static void circleDraw(Pane canvas, DrawSettings drawSettings,
                                   Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {
@@ -153,7 +154,7 @@ public class ShapeFeature {
 
         canvas.setOnMouseReleased(event -> {circle = null;});
     }
-
+    //Ellipse Function
     public static void ellipseDraw(Pane canvas, DrawSettings drawSettings,
                                    Boolean filled, Boolean dashed) {
         canvas.setOnMousePressed( event -> {

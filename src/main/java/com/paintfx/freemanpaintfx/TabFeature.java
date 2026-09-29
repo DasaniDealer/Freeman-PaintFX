@@ -1,12 +1,16 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeLineJoin;
 
 public class TabFeature {
     private static int tabCount = 0;
@@ -38,13 +42,19 @@ public class TabFeature {
         prevCanvas.heightProperty().bind(canvasContainer.heightProperty());
 
         canvasContainer.widthProperty().addListener((obs, oldW, newW) -> {
-            CanvasFeature.canvasResize(mainCanvas, gc, oldW.doubleValue(), canvasContainer.getHeight());
-            CanvasFeature.canvasResize(prevCanvas, pgc, oldW.doubleValue(), canvasContainer.getHeight());
+            double targetWidth = newW.doubleValue();
+            double currentHeight = canvasContainer.getHeight();
+
+            MiscHandles.canvasResize(mainCanvas, targetWidth, currentHeight);
+            MiscHandles.canvasResize(prevCanvas, targetWidth, currentHeight);
         });
 
         canvasContainer.heightProperty().addListener((obs, oldH, newH) -> {
-            CanvasFeature.canvasResize(mainCanvas, gc, canvasContainer.getWidth(), oldH.doubleValue());
-            CanvasFeature.canvasResize(prevCanvas, pgc, canvasContainer.getWidth(), oldH.doubleValue());
+            double currentWidth = canvasContainer.getWidth();
+            double targetHeight = newH.doubleValue();
+
+            MiscHandles.canvasResize(mainCanvas, currentWidth, targetHeight);
+            MiscHandles.canvasResize(prevCanvas, currentWidth, targetHeight);
         });
 
         //Image and Canvas Stack
@@ -71,19 +81,6 @@ public class TabFeature {
         newTab.setContent(imagePane);
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
-    }
-
-    static void applySettings(GraphicsContext gc, DrawSettings drawSettings, boolean dashed) {
-        gc.setStroke(drawSettings.getColor());
-        gc.setLineWidth(drawSettings.getSize());
-        gc.setLineCap(StrokeLineCap.ROUND);
-
-        if (dashed) {
-            double lineWidth = drawSettings.getSize();
-            gc.setLineDashes(3 * lineWidth, 2 * lineWidth);
-        } else {
-            gc.setLineDashes((double[]) null);
-        }
     }
 
     public record TabRecord(

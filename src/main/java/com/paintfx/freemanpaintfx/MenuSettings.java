@@ -38,7 +38,7 @@ public class MenuSettings extends MenuBar{
         openImage.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                OpenFeature.open(context.imageView(), primaryStage, context.gc(), context.mainCanvas(), context.canvasContainer());
+                MenuHandles.handleOpen(context.imageView(), primaryStage, context.gc(), context.mainCanvas(), context.canvasContainer());
             }
         });
         openImage.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
@@ -48,7 +48,7 @@ public class MenuSettings extends MenuBar{
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
                 WritableImage combineImage = context.combineArea().snapshot(null, null);
-                SaveFeature.save(combineImage, primaryStage);
+                MenuHandles.handleSave(combineImage, primaryStage);
                 PaintApplication.isSaved = true;
             }
         });
@@ -59,7 +59,7 @@ public class MenuSettings extends MenuBar{
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
                 WritableImage combineImage = context.combineArea().snapshot(null, null);
-                SaveFeature.saveAs(combineImage, primaryStage);
+                MenuHandles.handleSaveAs(combineImage, primaryStage);
                 PaintApplication.isSaved = true;
             }
         });

@@ -1,19 +1,126 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
-import javafx.stage.Stage;
-import javafx.stage.Window;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
+
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 public class MenuHandles {
+    private static File currentFile = null;
+
+    //Open Function
+    public static void handleOpen(ImageView imageView, Stage primaryStage, GraphicsContext gc, Canvas canvas, Pane canvasContainer) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select an Image File");
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp")
+        );
+
+        File imageFile = fileChooser.showOpenDialog(primaryStage);
+        if (imageFile != null) {
+            try {
+                Image image = new Image(imageFile.toURI().toString());
+
+                canvas.widthProperty().unbind();
+                canvas.heightProperty().unbind();
+
+                imageView.setPreserveRatio(true);
+                imageView.setImage(image);
+
+                canvasContainer.setPrefSize(image.getWidth(), image.getHeight());
+                canvas.setWidth(image.getWidth());
+                canvas.setHeight(image.getHeight());
+
+                canvas.widthProperty().bind(canvasContainer.widthProperty());
+                canvas.heightProperty().bind(canvasContainer.heightProperty());
+
+                canvasContainer.getChildren().removeIf(node -> node != canvas && node != imageView);
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+                setCurrentFile(imageFile);
+                PaintApplication.isSaved = false;
+
+            } catch (Exception error) {
+                System.err.println("Error loading image file: " + error.getMessage());
+                error.printStackTrace();
+            }
+        }
+    }
+    //Save Function
+    public static void handleSave(Image image, Window primaryWindow) {
+        if (image == null) {
+            return;
+        }
+        //Save
+        if (currentFile != null) {
+            try {
+                String fileName = currentFile.getName();
+                String path = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), path, currentFile);
+                System.out.println("Saved " + currentFile.getAbsolutePath());
+            } catch (IOException e) {
+                handleSaveAs(image, primaryWindow);
+            }
+        }
+        //Save As
+        else {
+            handleSaveAs(image, primaryWindow);
+        }
+    }
+    //Save As Function
+    public static void handleSaveAs(Image image, Window primaryWindow) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save As");
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("PNG Files (*.png)", "*.png"),
+                new FileChooser.ExtensionFilter("JPEG Files (*.jpg, *.jpeg)", "*.jpg", "*.jpeg"),
+                new FileChooser.ExtensionFilter("GIF Files (*.gif)", "*.gif"),
+                new FileChooser.ExtensionFilter("BMP Files (*.bmp)", "*.bmp" )
+        );
+
+        File saveFile = fileChooser.showSaveDialog(primaryWindow);
+
+        if (saveFile != null) {
+            try {
+                String fileName = saveFile.getName();
+                String fileExtension = "png"; //default
+
+                //Find Extension
+                int dotIndex = fileName.lastIndexOf(".");
+                if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
+                    fileExtension = fileName.substring(dotIndex + 1).toLowerCase();
+                } else {
+                    //Use Default if not
+                    saveFile = new File(saveFile.getAbsolutePath() + "." + fileExtension);
+                }
+
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), fileExtension, saveFile);
+                currentFile = saveFile;
+                PaintApplication.isSaved = true;
+            }
+            catch (IOException ex) {
+                System.out.println("Error");
+            }
+        }
+    }
+    //Help Pop-Up
     public static void handleHelp(Popup helpPopup, Stage primaryStage) {
         VBox popupRoot = new VBox(15);
         popupRoot.setAlignment(Pos.CENTER);
@@ -38,7 +145,7 @@ public class MenuHandles {
 
         helpPopup.show(primaryStage);
     }
-
+    //Close Intercept
     public static void handleExit(WindowEvent event, WritableImage imageSnap) {
         if(PaintApplication.isSaved) {
             return;
@@ -61,7 +168,7 @@ public class MenuHandles {
         if(result.isPresent()) {
             if(result.get() == buttonSave) {
                 Window windowSnap = (Window) event.getTarget();
-                SaveFeature.saveAs(imageSnap, windowSnap);
+                handleSaveAs(imageSnap, windowSnap);
             }
             else if(result.get() == buttonDiscard) {
                 return;
@@ -71,4 +178,8 @@ public class MenuHandles {
             }
         }
     }
+
+    //Get and Set Current File
+    public static File getCurrentFile() {return currentFile;}
+    public static void setCurrentFile(File file) {currentFile = file;}
 }

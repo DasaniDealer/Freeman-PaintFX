@@ -1,6 +1,7 @@
 package com.paintfx.freemanpaintfx;
 
 import javafx.event.ActionEvent;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
@@ -9,7 +10,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
 
 import java.util.Optional;
 
@@ -18,25 +18,19 @@ import java.util.Optional;
  * free draw, line draw, color picking, and canvas resizing
  * <p>
  */
-public class CanvasFeature {
+public class SideMenuHandles {
     static double startX, startY;
-    //Object Initialization
-    static Line line;
     static Boolean isDrawing = true;
 
     //Mouse Free Draw
-    static void drawLine(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
+    static void drawLine(Pane canvas, DrawSettings drawSettings, GraphicsContext gc, Boolean dashed) {
         canvas.setOnMousePressed(event -> {
-            gc.setStroke(drawSettings.getColor());
-            gc.setLineWidth(drawSettings.getSize());
-            gc.setLineCap(StrokeLineCap.ROUND);
-            gc.setLineJoin(StrokeLineJoin.ROUND);
-
             gc.beginPath();
             gc.moveTo(event.getX(), event.getY());
             gc.stroke();
         });
         canvas.setOnMouseDragged(event -> {
+            MiscHandles.applySettings(gc, drawSettings, dashed);
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
         });
@@ -54,32 +48,37 @@ public class CanvasFeature {
         });
 
         prevCanvas.setOnMouseDragged(event -> {
-            if (!isDrawing) {return;}
+            if (!isDrawing) {
+                return;
+            }
 
-            pgc.clearRect(0,0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            TabFeature.applySettings(pgc, drawSettings, dashed);
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            MiscHandles.applySettings(pgc, drawSettings, dashed);
             pgc.strokeLine(startX, startY, event.getX(), event.getY());
 
         });
 
         prevCanvas.setOnMouseReleased(event -> {
-            if(!isDrawing) {return;}
+            if (!isDrawing) {
+                return;
+            }
             isDrawing = false;
 
-            pgc.clearRect(0,0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            TabFeature.applySettings(gc, drawSettings, dashed);
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            MiscHandles.applySettings(gc, drawSettings, dashed);
             gc.strokeLine(startX, startY, event.getX(), event.getY());
         });
 
     }
 
-    static void eraserTool(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
+    static void eraserTool(Pane canvas, DrawSettings drawSettings, GraphicsContext gc, boolean dashed) {
         canvas.setOnMousePressed(event -> {
             clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
         });
 
         // Handle when the user drags the mouse to erase along a path
         canvas.setOnMouseDragged(event -> {
+            MiscHandles.applySettings(gc, drawSettings, dashed);
             clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
         });
     }
@@ -123,43 +122,12 @@ public class CanvasFeature {
         //Button Choice
         Optional<ButtonType> result = clearAlert.showAndWait();
 
-        if(result.isPresent()) {
-            if(result.get() == buttonConfirm) {
+        if (result.isPresent()) {
+            if (result.get() == buttonConfirm) {
                 canvas.getChildren().clear();
-            }
-            else {
+            } else {
                 event.consume();
             }
         }
-    }
-
-    //Canvas Resizing
-    static void canvasResize(Canvas canvas, GraphicsContext gc, double oldWidth, double oldHeight) {
-        double newWidth = canvas.getWidth();
-        double newHeight = canvas.getHeight();
-
-        if (newWidth <= 0 || newHeight <= 0 || (newWidth == oldWidth && newHeight == oldHeight)) {
-            return;
-        }
-        //Backup Of Settings
-        javafx.scene.paint.Paint currentStroke = gc.getStroke();
-        double currentWidth = gc.getLineWidth();
-        StrokeLineCap currentCap = gc.getLineCap();
-        StrokeLineJoin currentJoin = gc.getLineJoin();
-        double[] currentDashes = gc.getLineDashes();
-
-        int bufWidth = Math.max(1, (int) oldWidth);
-        int bufHeight = Math.max(1, (int) oldHeight);
-        WritableImage buffer = new WritableImage(bufWidth, bufHeight);
-
-        canvas.snapshot(null,buffer);
-
-        gc.setStroke(currentStroke);
-        gc.setLineWidth(currentWidth);
-        gc.setLineCap(currentCap);
-        gc.setLineJoin(currentJoin);
-        gc.setLineDashes(currentDashes);
-
-        gc.drawImage(buffer, 0, 0);
     }
 }

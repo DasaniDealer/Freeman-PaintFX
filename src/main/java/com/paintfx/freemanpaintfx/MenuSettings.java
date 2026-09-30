@@ -67,7 +67,7 @@ public class MenuSettings extends MenuBar{
 
         //Tab Features
         addTab.setOnAction(event -> {
-            TabFeature.addTab(tabPane, drawSettings);
+            TabFeature.addTab(tabPane);
         });
 
         //Help Popup

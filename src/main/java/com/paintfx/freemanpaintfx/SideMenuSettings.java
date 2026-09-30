@@ -102,10 +102,10 @@ public class SideMenuSettings {
 
                 //Toggle Button Effects
                 if (newToggle == pencilButton) {
-                    SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc(), false);
+                    SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc());
                 }
                 if (newToggle == eraserButton) {
-                    SideMenuHandles.eraserTool(context.canvasContainer(), drawSettings, context.gc(), false);
+                    SideMenuHandles.eraserTool(context.canvasContainer(), drawSettings, context.gc());
                 }
                 if (newToggle == grabButton) {
                     SideMenuHandles.grabColor(context.canvasContainer(), drawSettings, toolToggle);
@@ -141,7 +141,7 @@ public class SideMenuSettings {
         clearButton.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                SideMenuHandles.clearCanvas(context.canvasContainer(), event);
+                SideMenuHandles.clearCanvas(context, event);
             }
         });
 
@@ -155,41 +155,53 @@ public class SideMenuSettings {
                 //Unselect Main Menu Items
                 toolToggle.selectToggle(null);
                 lineToggle.selectToggle(null);
-                //region Toggle Button Effects
+                //Toggle Button Effects
                 if (newToggle == squareButton) {
-                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, false, true);
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false, 4);
                 } else if (newToggle == fillSquareButton) {
-                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, true, false, true);
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false, 4);
                 } else if (newToggle == dashSquareButton) {
-                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, true, true);
-                }
-
-                if (newToggle == rectButton) {
-                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, false, false);
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true, 4);
+                } else if (newToggle == rectButton) {
+                    ShapeHandles.rectDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false);
                 } else if (newToggle == fillRectButton) {
-                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, true, false, false);
+                    ShapeHandles.rectDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false);
                 } else if (newToggle == dashRectButton) {
-                    ShapeHandles.rectDraw(context.canvasContainer(), drawSettings, false, true, false);
+                    ShapeHandles.rectDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true);
                 } else if (newToggle == triangleButton) {
-                    ShapeHandles.triangleDraw(context.canvasContainer(), drawSettings, false, false);
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false, 3);
                 } else if (newToggle == fillTriangleButton) {
-                    ShapeHandles.triangleDraw(context.canvasContainer(), drawSettings, true, false);
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false, 3);
                 } else if (newToggle == dashTriangleButton) {
-                    ShapeHandles.triangleDraw(context.canvasContainer(), drawSettings, false, true);
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true, 3);
                 } else if (newToggle == circleButton) {
-                    ShapeHandles.circleDraw(context.canvasContainer(), drawSettings, false, false);
+                    ShapeHandles.circleDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false);
                 } else if (newToggle == fillCircleButton) {
-                    ShapeHandles.circleDraw(context.canvasContainer(), drawSettings, true, false);
+                    ShapeHandles.circleDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false);
                 } else if (newToggle == dashCircleButton) {
-                    ShapeHandles.circleDraw(context.canvasContainer(), drawSettings, false, true);
+                    ShapeHandles.circleDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true);
                 } else if (newToggle == ellipseButton) {
-                    ShapeHandles.ellipseDraw(context.canvasContainer(), drawSettings, false, false);
+                    ShapeHandles.ellipseDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false);
                 } else if (newToggle == fillEllipseButton) {
-                    ShapeHandles.ellipseDraw(context.canvasContainer(), drawSettings, true, false);
+                    ShapeHandles.ellipseDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false);
                 } else if (newToggle == dashEllipseButton) {
-                    ShapeHandles.ellipseDraw(context.canvasContainer(), drawSettings, false, true);
+                    ShapeHandles.ellipseDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true);
                 }
-                //endregion
                 isSaved = false;
             }
         });

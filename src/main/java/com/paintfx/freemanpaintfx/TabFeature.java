@@ -1,21 +1,16 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeLineJoin;
 
 public class TabFeature {
     private static int tabCount = 0;
 
-    public static void addTab(TabPane tabPane, DrawSettings drawSettings) {
+    public static void addTab(TabPane tabPane) {
         tabCount++;
 
         Tab newTab = new Tab("Tab " + tabCount);
@@ -40,22 +35,6 @@ public class TabFeature {
 
         prevCanvas.widthProperty().bind(canvasContainer.widthProperty());
         prevCanvas.heightProperty().bind(canvasContainer.heightProperty());
-
-        canvasContainer.widthProperty().addListener((obs, oldW, newW) -> {
-            double targetWidth = newW.doubleValue();
-            double currentHeight = canvasContainer.getHeight();
-
-            MiscHandles.canvasResize(mainCanvas, targetWidth, currentHeight);
-            MiscHandles.canvasResize(prevCanvas, targetWidth, currentHeight);
-        });
-
-        canvasContainer.heightProperty().addListener((obs, oldH, newH) -> {
-            double currentWidth = canvasContainer.getWidth();
-            double targetHeight = newH.doubleValue();
-
-            MiscHandles.canvasResize(mainCanvas, currentWidth, targetHeight);
-            MiscHandles.canvasResize(prevCanvas, currentWidth, targetHeight);
-        });
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);

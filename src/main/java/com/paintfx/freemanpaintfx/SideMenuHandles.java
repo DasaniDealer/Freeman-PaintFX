@@ -1,13 +1,11 @@
 package com.paintfx.freemanpaintfx;
 
 import javafx.event.ActionEvent;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -23,21 +21,21 @@ public class SideMenuHandles {
     static Boolean isDrawing = true;
 
     //Mouse Free Draw
-    static void drawLine(Pane canvas, DrawSettings drawSettings, GraphicsContext gc, Boolean dashed) {
+    static void drawLine(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
         canvas.setOnMousePressed(event -> {
             gc.beginPath();
             gc.moveTo(event.getX(), event.getY());
             gc.stroke();
         });
         canvas.setOnMouseDragged(event -> {
-            MiscHandles.applySettings(gc, drawSettings, dashed);
+            MiscHandles.applySettings(gc, drawSettings, false);
             gc.lineTo(event.getX(), event.getY());
             gc.stroke();
         });
     }
 
     //Straight Line Draw
-    static void drawStraight(Canvas mainCanvas, Canvas prevCanvas, DrawSettings drawSettings, Boolean dashed) {
+    static void drawStraight(Canvas mainCanvas, Canvas prevCanvas, DrawSettings drawSettings, boolean dashed) {
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
         GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
 
@@ -48,9 +46,7 @@ public class SideMenuHandles {
         });
 
         prevCanvas.setOnMouseDragged(event -> {
-            if (!isDrawing) {
-                return;
-            }
+            if (!isDrawing) {return;}
 
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
             MiscHandles.applySettings(pgc, drawSettings, dashed);
@@ -59,9 +55,7 @@ public class SideMenuHandles {
         });
 
         prevCanvas.setOnMouseReleased(event -> {
-            if (!isDrawing) {
-                return;
-            }
+            if (!isDrawing) {return;}
             isDrawing = false;
 
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
@@ -71,18 +65,18 @@ public class SideMenuHandles {
 
     }
 
-    static void eraserTool(Pane canvas, DrawSettings drawSettings, GraphicsContext gc, boolean dashed) {
+    //Eraser Tool
+    static void eraserTool(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
         canvas.setOnMousePressed(event -> {
             clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
         });
 
         // Handle when the user drags the mouse to erase along a path
         canvas.setOnMouseDragged(event -> {
-            MiscHandles.applySettings(gc, drawSettings, dashed);
+            MiscHandles.applySettings(gc, drawSettings, false);
             clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
         });
     }
-
     private static void clearPixelsAt(double x, double y, GraphicsContext gc, double brushSize) {
         // Calculate Brush Size
         double offset = brushSize / 2;
@@ -109,7 +103,8 @@ public class SideMenuHandles {
         });
     }
 
-    static void clearCanvas(Pane canvas, ActionEvent event) {
+    //Clear Canvas
+    static void clearCanvas(TabFeature.TabRecord context, ActionEvent event) {
         Alert clearAlert = new Alert(Alert.AlertType.CONFIRMATION);
         clearAlert.setTitle("You Are About To Clear Canvas");
         clearAlert.setContentText("Are You Sure?");
@@ -124,7 +119,18 @@ public class SideMenuHandles {
 
         if (result.isPresent()) {
             if (result.get() == buttonConfirm) {
-                canvas.getChildren().clear();
+                //Clear Canvas
+                Canvas mainCanvas = context.mainCanvas();
+                Canvas prevCanvas = context.prevCanvas();
+
+                if (mainCanvas != null) {
+                    mainCanvas.getGraphicsContext2D().clearRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
+                }
+                if (prevCanvas != null) {
+                    prevCanvas.getGraphicsContext2D().clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+                }
+
+                MiscHandles.clearListeners(context);
             } else {
                 event.consume();
             }

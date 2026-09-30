@@ -34,7 +34,7 @@ public class PaintApplication extends Application {
         root.setRight(sideMenu.getView());
         root.setCenter(tabPane);
 
-        TabFeature.addTab(tabPane, drawSettings);
+        TabFeature.addTab(tabPane);
 
         //SHOWTIME
         Scene scene = new Scene(root, 1150, 650);

@@ -1,5 +1,6 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
@@ -18,8 +19,9 @@ public class TabFeature {
         //Image & Canvas Create
         ImageView imageView = new ImageView();
         imageView.setPreserveRatio(true);
+        imageView.setMouseTransparent(true);
 
-        Pane canvasContainer = new Pane();
+        Group canvasContainer = new Group();
 
         Canvas mainCanvas = new Canvas(1150, 650);
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
@@ -28,13 +30,6 @@ public class TabFeature {
         GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
 
         canvasContainer.getChildren().addAll(mainCanvas,prevCanvas);
-
-        //Connect Canvas to Container
-        mainCanvas.widthProperty().bind(canvasContainer.widthProperty());
-        mainCanvas.heightProperty().bind(canvasContainer.heightProperty());
-
-        prevCanvas.widthProperty().bind(canvasContainer.widthProperty());
-        prevCanvas.heightProperty().bind(canvasContainer.heightProperty());
 
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);
@@ -66,7 +61,7 @@ public class TabFeature {
             ImageView imageView,
             Canvas mainCanvas,
             Canvas prevCanvas,
-            Pane canvasContainer,
+            Group canvasContainer,
             GraphicsContext gc,
             GraphicsContext pgc,
             StackPane combineArea

@@ -1,6 +1,7 @@
 package com.paintfx.freemanpaintfx;
 
 import javafx.event.ActionEvent;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
@@ -21,7 +22,7 @@ public class SideMenuHandles {
     static Boolean isDrawing = true;
 
     //Mouse Free Draw
-    static void drawLine(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
+    static void drawLine(Group canvas, DrawSettings drawSettings, GraphicsContext gc) {
         canvas.setOnMousePressed(event -> {
             gc.beginPath();
             gc.moveTo(event.getX(), event.getY());
@@ -66,7 +67,7 @@ public class SideMenuHandles {
     }
 
     //Eraser Tool
-    static void eraserTool(Pane canvas, DrawSettings drawSettings, GraphicsContext gc) {
+    static void eraserTool(Group canvas, DrawSettings drawSettings, GraphicsContext gc) {
         canvas.setOnMousePressed(event -> {
             clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
         });
@@ -84,7 +85,7 @@ public class SideMenuHandles {
     }
 
     //Color Grabber
-    static void grabColor(Pane canvas, DrawSettings drawSettings, ToggleGroup toolToggle) {
+    static void grabColor(Group canvas, DrawSettings drawSettings, ToggleGroup toolToggle) {
         canvas.setCursor(javafx.scene.Cursor.CROSSHAIR);
 
         canvas.setOnMouseClicked(event -> {

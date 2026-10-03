@@ -2,12 +2,10 @@ package com.paintfx.freemanpaintfx;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -24,7 +22,11 @@ public class MenuHandles {
     private static File currentFile = null;
 
     //Open Function
-    public static void handleOpen(ImageView imageView, Stage primaryStage, GraphicsContext gc, Canvas canvas, Pane canvasContainer) {
+    public static void handleOpen(TabPane tabPane, Stage primaryStage) {
+        Tab currentTab = tabPane.getSelectionModel().getSelectedItem();
+        if (currentTab == null) return;
+        TabFeature.TabRecord record = (TabFeature.TabRecord) currentTab.getUserData();
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select an Image File");
 
@@ -37,24 +39,18 @@ public class MenuHandles {
             try {
                 Image image = new Image(imageFile.toURI().toString());
 
-                canvas.widthProperty().unbind();
-                canvas.heightProperty().unbind();
+                double width = image.getWidth();
+                double height = image.getHeight();
 
-                imageView.setPreserveRatio(true);
-                imageView.setImage(image);
+                record.imageView().setImage(image);
+                record.mainCanvas().setWidth(width);
+                record.mainCanvas().setHeight(height);
+                record.prevCanvas().setWidth(width);
+                record.prevCanvas().setHeight(height);
 
-                canvasContainer.setPrefSize(image.getWidth(), image.getHeight());
-                canvas.setWidth(image.getWidth());
-                canvas.setHeight(image.getHeight());
+                record.gc().clearRect(0, 0, width, height);
+                record.pgc().clearRect(0, 0, width, height);
 
-                canvas.widthProperty().bind(canvasContainer.widthProperty());
-                canvas.heightProperty().bind(canvasContainer.heightProperty());
-
-                canvasContainer.getChildren().removeIf(node -> node != canvas && node != imageView);
-                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-                setCurrentFile(imageFile);
-                PaintApplication.isSaved = false;
 
             } catch (Exception error) {
                 System.err.println("Error loading image file: " + error.getMessage());

@@ -12,7 +12,9 @@ public class MiscHandles {
     //Apply Brush Settings
     static void applySettings(GraphicsContext gc, DrawSettings drawSettings, boolean dashed) {
         gc.setStroke(drawSettings.getColor());
+        gc.setFill(drawSettings.getColor());
         gc.setLineWidth(drawSettings.getSize());
+
         gc.setLineCap(StrokeLineCap.ROUND);
         gc.setLineJoin(StrokeLineJoin.ROUND);
 

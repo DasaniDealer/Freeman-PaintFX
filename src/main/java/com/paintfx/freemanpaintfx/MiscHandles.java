@@ -38,6 +38,8 @@ public class MiscHandles {
         prevCanvas.setOnMousePressed(null);
         prevCanvas.setOnMouseDragged(null);
         prevCanvas.setOnMouseReleased(null);
+
+        SelectHandles.hideFloatingMenu();
     }
 
     //Canvas Resizing

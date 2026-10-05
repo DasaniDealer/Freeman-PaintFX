@@ -20,7 +20,7 @@ import java.util.Optional;
 public class SideMenuHandles {
     static double startX, startY;
     static Boolean isDrawing = true;
-
+    
     //Mouse Free Draw
     static void drawLine(Group canvas, DrawSettings drawSettings, GraphicsContext gc) {
         canvas.setOnMousePressed(event -> {

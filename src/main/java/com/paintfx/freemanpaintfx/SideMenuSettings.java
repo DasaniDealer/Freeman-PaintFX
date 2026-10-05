@@ -1,6 +1,7 @@
 package com.paintfx.freemanpaintfx;
 
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class SideMenuSettings {
@@ -8,13 +9,14 @@ public class SideMenuSettings {
     private boolean isSaved;
 
     public SideMenuSettings(TabPane tabPane, DrawSettings drawSettings) {
-        sideMenu = new VBox(15);
-        sideMenu.setStyle("-fx-padding: 15; -fx-background-color: #c5c7ca; -fx-pref-width: 160;");
+        sideMenu = new VBox(10);
+        sideMenu.setStyle("-fx-padding: 10; -fx-background-color: #c5c7ca; -fx-pref-width: 160;");
 
         ToggleButton grabButton = drawSettings.getGrabButton();
 
         Label toolsLabel = new Label("Tools");
         toolsLabel.setStyle("-fx-font-weight: bold;");
+        ToggleButton selectButton = new ToggleButton("Select");
         ToggleButton pencilButton = new ToggleButton("Pencil");
         ToggleButton eraserButton = new ToggleButton("Eraser");
         Button clearButton = new Button("Clear Canvas");
@@ -41,25 +43,43 @@ public class SideMenuSettings {
         RadioMenuItem fillCircleButton = new RadioMenuItem("Filled Circle");
         RadioMenuItem fillEllipseButton = new RadioMenuItem("Filled Ellipse");
 
+        RadioMenuItem polygonButton = new RadioMenuItem("Polygon");
+        RadioMenuItem dashPolygonButton = new RadioMenuItem("Dashed Polygon");
+        RadioMenuItem fillPolygonButton = new RadioMenuItem("Filled Polygon");
+        Spinner<Integer> sideSpinner = new Spinner<>(3, 20, 5);
+        sideSpinner.setEditable(true);
+
         //Menu Groups
         MenuButton lineMenu = new MenuButton("Line");
         MenuButton shapeMenu = new MenuButton("Shape");
         MenuButton dashMenu = new MenuButton("Dashed Shape");
         MenuButton fillShapeMenu = new MenuButton("Filled Shape");
+        MenuButton polygonMenu = new MenuButton("Polygon");
 
         //Toggle Groups
         ToggleGroup toolToggle = new ToggleGroup();
         ToggleGroup lineToggle = new ToggleGroup();
         ToggleGroup shapeToggle = new ToggleGroup();
 
-        toolToggle.getToggles().addAll(pencilButton, eraserButton, grabButton);
+        toolToggle.getToggles().addAll(selectButton, pencilButton, eraserButton, grabButton,
+                polygonButton, dashPolygonButton, fillPolygonButton);
         lineToggle.getToggles().addAll(lineButton, dashButton);
+
         //Shape Menu
         shapeToggle.getToggles().addAll(squareButton, dashSquareButton, fillSquareButton,
                 rectButton, dashRectButton, fillRectButton,
                 triangleButton, dashTriangleButton, fillTriangleButton,
                 circleButton, dashCircleButton, fillCircleButton,
                 ellipseButton, dashEllipseButton, fillEllipseButton);
+
+        //Polygon HBox
+        HBox polygonBox = new HBox(5);
+        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        sideSpinner.setPrefWidth(75);
+        polygonMenu.setPrefWidth(110);
+
+        polygonBox.getChildren().addAll(sideSpinner, polygonMenu);
 
         //Clear New Tab Listeners
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
@@ -79,8 +99,9 @@ public class SideMenuSettings {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, pencilButton, eraserButton, clearButton,
+                toolsLabel, selectButton, pencilButton, eraserButton, clearButton,
                 lineMenu, shapeMenu, dashMenu, fillShapeMenu,
+                polygonBox,
                 drawSettings
         );
 
@@ -88,8 +109,9 @@ public class SideMenuSettings {
         shapeMenu.getItems().addAll(squareButton, rectButton, triangleButton, circleButton, ellipseButton);
         dashMenu.getItems().addAll(dashSquareButton, dashRectButton, dashTriangleButton, dashCircleButton, dashEllipseButton);
         fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillCircleButton, fillEllipseButton);
+        polygonMenu.getItems().addAll(polygonButton, dashPolygonButton, fillPolygonButton);
 
-        //Free Draw/Erase
+        //Tool Buttons
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
@@ -101,14 +123,24 @@ public class SideMenuSettings {
                 shapeToggle.selectToggle(null);
 
                 //Toggle Button Effects
-                if (newToggle == pencilButton) {
+
+                if (newToggle == selectButton) {
+                    SelectHandles.SelectionTool(context.mainCanvas(), context.prevCanvas());
+                }else if (newToggle == pencilButton) {
                     SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc());
-                }
-                if (newToggle == eraserButton) {
+                } else if (newToggle == eraserButton) {
                     SideMenuHandles.eraserTool(context.canvasContainer(), drawSettings, context.gc());
-                }
-                if (newToggle == grabButton) {
+                } else if (newToggle == grabButton) {
                     SideMenuHandles.grabColor(context.canvasContainer(), drawSettings, toolToggle);
+                } else if (newToggle == polygonButton) {
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false, sideSpinner.getValue());
+                } else if (newToggle == dashPolygonButton) {
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true, sideSpinner.getValue());
+                } else if (newToggle == fillPolygonButton) {
+                    ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false, sideSpinner.getValue());
                 }
 
                 isSaved = false;

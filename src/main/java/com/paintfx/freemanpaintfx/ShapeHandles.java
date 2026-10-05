@@ -9,9 +9,6 @@ public class ShapeHandles {
     private static double startX;
     private static double startY;
 
-    private static Circle circle;
-    private static Ellipse ellipse;
-
     //Square & Rectangle Function
     public static void rectDraw(Canvas mainCanvas, Canvas prevCanvas, DrawSettings drawSettings,
                                 boolean filled, boolean dashed) {

@@ -1,10 +1,8 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 
@@ -39,31 +37,6 @@ public class MiscHandles {
         prevCanvas.setOnMouseDragged(null);
         prevCanvas.setOnMouseReleased(null);
 
-        SelectHandles.hideFloatingMenu();
-    }
-
-    //Canvas Resizing
-    public static void canvasResize(Canvas canvas, double newWidth, double newHeight) {
-        double oldWidth = canvas.getWidth();
-        double oldHeight = canvas.getHeight();
-
-        if (newWidth <= 0 || newHeight <= 0 || (newWidth == oldWidth && newHeight == oldHeight)) {
-            return;
-        }
-
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        int bufWidth = Math.max(1, (int) oldWidth);
-        int bufHeight = Math.max(1, (int) oldHeight);
-
-        WritableImage buffer = new WritableImage(bufWidth, bufHeight);
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
-        canvas.snapshot(params, buffer);
-
-        gc.save();
-        gc.clearRect(0, 0, newWidth, newHeight);
-        gc.drawImage(buffer, 0, 0);
-        gc.restore();
+        SelectHandles.commitPaste(context.mainCanvas(), context.prevCanvas());
     }
 }

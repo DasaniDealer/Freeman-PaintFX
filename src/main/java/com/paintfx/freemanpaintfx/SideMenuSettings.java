@@ -123,9 +123,8 @@ public class SideMenuSettings {
                 shapeToggle.selectToggle(null);
 
                 //Toggle Button Effects
-
                 if (newToggle == selectButton) {
-                    SelectHandles.SelectionTool(context.mainCanvas(), context.prevCanvas());
+                    SelectHandles.selectionTool(context.mainCanvas(), context.prevCanvas());
                 }else if (newToggle == pencilButton) {
                     SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc());
                 } else if (newToggle == eraserButton) {

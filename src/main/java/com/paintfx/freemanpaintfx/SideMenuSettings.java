@@ -1,5 +1,6 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -8,19 +9,35 @@ public class SideMenuSettings {
     private final VBox sideMenu;
     private boolean isSaved;
 
+    private void triggerAction(TabPane tabPane, java.util.function.Consumer<TabFeature.TabRecord> action) {
+        Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+        if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+            action.accept(context);
+            isSaved = false;
+        }
+    }
+
     public SideMenuSettings(TabPane tabPane, DrawSettings drawSettings) {
         sideMenu = new VBox(10);
         sideMenu.setStyle("-fx-padding: 10; -fx-background-color: #c5c7ca; -fx-pref-width: 160;");
 
-        ToggleButton grabButton = drawSettings.getGrabButton();
-
         Label toolsLabel = new Label("Tools");
         toolsLabel.setStyle("-fx-font-weight: bold;");
+
+        //Undo Redo Buttons
+        Button undoButton = new Button("Undo");
+        Button redoButton = new Button("Redo");
+
+        undoButton.setOnAction(event -> triggerAction(tabPane, context -> CanvasHistory.undo(context.mainCanvas())));
+        redoButton.setOnAction(event -> triggerAction(tabPane, context -> CanvasHistory.redo(context.mainCanvas())));
+
         ToggleButton selectButton = new ToggleButton("Select");
         ToggleButton pencilButton = new ToggleButton("Pencil");
         ToggleButton eraserButton = new ToggleButton("Eraser");
         ToggleButton textButton = new ToggleButton("Text");
+        ToggleButton grabButton = drawSettings.getGrabButton();
         Button clearButton = new Button("Clear Canvas");
+
 
         RadioMenuItem lineButton = new RadioMenuItem("Line");
         RadioMenuItem dashButton = new RadioMenuItem("Dashed");
@@ -43,7 +60,7 @@ public class SideMenuSettings {
         RadioMenuItem fillTriangleButton = new RadioMenuItem("Filled Triangle");
         RadioMenuItem fillCircleButton = new RadioMenuItem("Filled Circle");
         RadioMenuItem fillEllipseButton = new RadioMenuItem("Filled Ellipse");
-
+        //Custom Polygon Button
         RadioMenuItem polygonButton = new RadioMenuItem("Polygon");
         RadioMenuItem dashPolygonButton = new RadioMenuItem("Dashed Polygon");
         RadioMenuItem fillPolygonButton = new RadioMenuItem("Filled Polygon");
@@ -59,13 +76,12 @@ public class SideMenuSettings {
 
         //Toggle Groups
         ToggleGroup toolToggle = new ToggleGroup();
-        ToggleGroup lineToggle = new ToggleGroup();
         ToggleGroup shapeToggle = new ToggleGroup();
 
         toolToggle.getToggles().addAll(selectButton, pencilButton, eraserButton,
                 textButton, grabButton,
-                polygonButton, dashPolygonButton, fillPolygonButton);
-        lineToggle.getToggles().addAll(lineButton, dashButton);
+                polygonButton, dashPolygonButton, fillPolygonButton,
+                lineButton, dashButton);
 
         //Shape Menu
         shapeToggle.getToggles().addAll(squareButton, dashSquareButton, fillSquareButton,
@@ -83,12 +99,17 @@ public class SideMenuSettings {
 
         polygonBox.getChildren().addAll(sideSpinner, polygonMenu);
 
+        //Undo Redo HBox
+        HBox undoRedoBox = new HBox(10);
+        undoRedoBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        undoRedoBox.getChildren().addAll(undoButton, redoButton);
+
         //Clear New Tab Listeners
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 //Clear Toggles
                 toolToggle.selectToggle(null);
-                lineToggle.selectToggle(null);
                 shapeToggle.selectToggle(null);
 
                 if (oldTab != null && oldTab.getUserData() instanceof TabFeature.TabRecord oldContext) {
@@ -101,10 +122,10 @@ public class SideMenuSettings {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, selectButton, pencilButton, eraserButton, textButton, clearButton,
+                toolsLabel, undoRedoBox,
+                selectButton, pencilButton, eraserButton, textButton, clearButton,
                 lineMenu, shapeMenu, dashMenu, fillShapeMenu,
-                polygonBox,
-                drawSettings
+                polygonBox, drawSettings
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
@@ -120,14 +141,20 @@ public class SideMenuSettings {
                 MiscHandles.clearListeners(context);
                 if (newToggle == null) {return;}
 
+                context.canvasContainer().addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+                    //Save State on Left-Click
+                    if (event.isPrimaryButtonDown()) {
+                        CanvasHistory.saveState(context.mainCanvas());
+                    }
+                });
+
                 //Unselect Dropdown Items
-                lineToggle.selectToggle(null);
                 shapeToggle.selectToggle(null);
 
                 //Toggle Button Effects
                 if (newToggle == selectButton) {
                     SelectHandles.selectionTool(context.mainCanvas(), context.prevCanvas());
-                }else if (newToggle == pencilButton) {
+                } else if (newToggle == pencilButton) {
                     SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc());
                 } else if (newToggle == eraserButton) {
                     SideMenuHandles.eraserTool(context.canvasContainer(), drawSettings, context.gc());
@@ -144,31 +171,27 @@ public class SideMenuSettings {
                 } else if (newToggle == fillPolygonButton) {
                     ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
                             true, false, sideSpinner.getValue());
-                }
-
-                isSaved = false;
-            }
-        });
-
-        //Lines
-        lineToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
-            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
-            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                //Clear Canvas Mouse
-                MiscHandles.clearListeners(context);
-                if (newToggle == null) return;
-
-                //Unselect Main Menu Items
-                toolToggle.selectToggle(null);
-                shapeToggle.selectToggle(null);
-                //Toggle Button Effects
-                if (newToggle == lineButton) {
+                } else if (newToggle == lineButton) {
                     SideMenuHandles.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, false);
                 } else if (newToggle == dashButton) {
                     SideMenuHandles.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, true);
                 }
 
                 isSaved = false;
+            }
+        });
+
+        //Undo Redo Button
+        undoButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                CanvasHistory.undo(context.mainCanvas());
+            }
+        });
+        redoButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                CanvasHistory.redo(context.mainCanvas());
             }
         });
 
@@ -187,9 +210,15 @@ public class SideMenuSettings {
                 MiscHandles.clearListeners(context);
                 if (newToggle == null) return;
 
+                context.canvasContainer().addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, event -> {
+                    //Save State on Left-Click
+                    if (event.isPrimaryButtonDown()) {
+                        CanvasHistory.saveState(context.mainCanvas());
+                    }
+                });
+
                 //Unselect Main Menu Items
                 toolToggle.selectToggle(null);
-                lineToggle.selectToggle(null);
                 //Toggle Button Effects
                 if (newToggle == squareButton) {
                     ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,

@@ -159,6 +159,7 @@ public class SideMenuHandles {
 
         if (result.isPresent()) {
             if (result.get() == buttonConfirm) {
+                CanvasHistory.saveState(context.mainCanvas());
                 //Clear Canvas
                 Canvas mainCanvas = context.mainCanvas();
                 Canvas prevCanvas = context.prevCanvas();

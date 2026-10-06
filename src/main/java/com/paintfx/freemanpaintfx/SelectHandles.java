@@ -19,7 +19,6 @@ public class SelectHandles {
     private static boolean isDraggingSelection = false;
     private static ContextMenu activeMenu = null;
 
-
     //Paste Variables
     static boolean isPastingMode = false;
     private static double pasteX;
@@ -187,6 +186,8 @@ public class SelectHandles {
                 double w = bounds[2];
                 double h = bounds[3];
 
+                CanvasHistory.saveState(mainCanvas);
+
                 copyToClipboard(mainCanvas, x, y, w, h);
                 mainCanvas.getGraphicsContext2D().clearRect(x, y, w, h);
 
@@ -254,6 +255,8 @@ public class SelectHandles {
         if (!isPastingMode || internalClipboard == null) {return;}
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
         GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
+
+        CanvasHistory.saveState(mainCanvas);
 
         gc.drawImage(internalClipboard, pasteX, pasteY);
 

@@ -19,6 +19,7 @@ public class SideMenuSettings {
         ToggleButton selectButton = new ToggleButton("Select");
         ToggleButton pencilButton = new ToggleButton("Pencil");
         ToggleButton eraserButton = new ToggleButton("Eraser");
+        ToggleButton textButton = new ToggleButton("Text");
         Button clearButton = new Button("Clear Canvas");
 
         RadioMenuItem lineButton = new RadioMenuItem("Line");
@@ -61,7 +62,8 @@ public class SideMenuSettings {
         ToggleGroup lineToggle = new ToggleGroup();
         ToggleGroup shapeToggle = new ToggleGroup();
 
-        toolToggle.getToggles().addAll(selectButton, pencilButton, eraserButton, grabButton,
+        toolToggle.getToggles().addAll(selectButton, pencilButton, eraserButton,
+                textButton, grabButton,
                 polygonButton, dashPolygonButton, fillPolygonButton);
         lineToggle.getToggles().addAll(lineButton, dashButton);
 
@@ -99,7 +101,7 @@ public class SideMenuSettings {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, selectButton, pencilButton, eraserButton, clearButton,
+                toolsLabel, selectButton, pencilButton, eraserButton, textButton, clearButton,
                 lineMenu, shapeMenu, dashMenu, fillShapeMenu,
                 polygonBox,
                 drawSettings
@@ -129,6 +131,8 @@ public class SideMenuSettings {
                     SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc());
                 } else if (newToggle == eraserButton) {
                     SideMenuHandles.eraserTool(context.canvasContainer(), drawSettings, context.gc());
+                } else if (newToggle == textButton) {
+                    SideMenuHandles.textTool(context.canvasContainer(), drawSettings, context.gc(), toolToggle);
                 } else if (newToggle == grabButton) {
                     SideMenuHandles.grabColor(context.canvasContainer(), drawSettings, toolToggle);
                 } else if (newToggle == polygonButton) {

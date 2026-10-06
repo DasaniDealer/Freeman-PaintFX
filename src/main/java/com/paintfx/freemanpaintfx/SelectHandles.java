@@ -16,7 +16,9 @@ public class SelectHandles {
     private static double startX;
     private static double startY;
     private static boolean hasSelection = false;
+    private static boolean isDraggingSelection = false;
     private static ContextMenu activeMenu = null;
+
 
     //Paste Variables
     static boolean isPastingMode = false;
@@ -34,44 +36,58 @@ public class SelectHandles {
         final double[] bounds = new double[4];
 
         prevCanvas.setOnMousePressed(event -> {
-            //After Paste Handle
-            if (isPastingMode) {
-
-                if (event.getX() >= pasteX && event.getX() <= (pasteX + internalClipboard.getWidth()) &&
-                        event.getY() >= pasteY && event.getY() <= (pasteY + internalClipboard.getHeight())) {
-
-                    dragOffsetX = event.getX() - pasteX;
-                    dragOffsetY = event.getY() - pasteY;
-                    return;
-                } else {
-                    commitPaste(mainCanvas, prevCanvas);
-                    return;
-                }
-            }
             if (activeMenu != null && activeMenu.isShowing()) {
                 activeMenu.hide();
                 activeMenu = null;
             }
 
-            if (hasSelection = false) {
+            //After Paste Handle
+            if (isPastingMode) {
+                if (event.isPrimaryButtonDown() &&
+                        event.getX() >= pasteX && event.getX() <= (pasteX + internalClipboard.getWidth()) &&
+                        event.getY() >= pasteY && event.getY() <= (pasteY + internalClipboard.getHeight())) {
+
+                    dragOffsetX = event.getX() - pasteX;
+                    dragOffsetY = event.getY() - pasteY;
+                    return;
+                } else if (event.isPrimaryButtonDown()) {
+                    commitPaste(mainCanvas, prevCanvas);
+                    return;
+                }
+            }
+
+            if (hasSelection && event.isPrimaryButtonDown()) {
                 double selX = bounds[0];
                 double selY = bounds[1];
                 double selW = bounds[2];
                 double selH = bounds[3];
 
-                //If Click Outside Select Area
-                if (event.getX() < selX || event.getX() > (selX + selW) ||
-                        event.getY() < selY || event.getY() > (selY + selH)) {
+                if (event.getX() >= selX && event.getX() <= (selX + selW) &&
+                        event.getY() >= selY && event.getY() <= (selY + selH)) {
 
+                    copyToClipboard(mainCanvas, selX, selY, selW, selH);
+
+                    gc.clearRect(selX, selY, selW, selH);
+
+                    isPastingMode = true;
+                    isDraggingSelection = true;
+                    hasSelection = false;
+                    pasteX = selX;
+                    pasteY = selY;
+                    dragOffsetX = event.getX() - pasteX;
+                    dragOffsetY = event.getY() - pasteY;
+                    return;
+                } else {
                     pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                     hasSelection = false;
-                    return;
                 }
             }
 
-            startX = event.getX();
-            startY = event.getY();
-            isDrawing = true;
+            if (event.isPrimaryButtonDown()) {
+                startX = event.getX();
+                startY = event.getY();
+                isDrawing = true;
+            }
         });
 
         prevCanvas.setOnMouseDragged(event -> {
@@ -84,7 +100,6 @@ public class SelectHandles {
                 pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                 pgc.drawImage(internalClipboard, pasteX, pasteY);
 
-                // Optional: Draw a subtle bounding box around the moving image
                 pgc.setStroke(Color.GRAY);
                 pgc.setLineWidth(1.0);
                 pgc.setLineDashes(2.0);
@@ -108,6 +123,17 @@ public class SelectHandles {
         });
 
         prevCanvas.setOnMouseReleased(event -> {
+            if (isDraggingSelection) {
+                isDraggingSelection = false;
+
+                bounds[0] = pasteX;
+                bounds[1] = pasteY;
+                bounds[2] = internalClipboard.getWidth();
+                bounds[3] = internalClipboard.getHeight();
+                hasSelection = true;
+                return;
+            }
+
             if (isPastingMode) return;
             if (!isDrawing) return;
             isDrawing = false;
@@ -130,11 +156,23 @@ public class SelectHandles {
             bounds[3] = height;
             hasSelection = true;
 
-            //Pop-Up Menu
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            pgc.setStroke(Color.GRAY);
+            pgc.setLineWidth(1.0);
+            pgc.setLineDashes(2.0);
+            pgc.strokeRect(x, y, width, height);
+        });
+
+
+        //Pop-Up Menu
+        prevCanvas.setOnContextMenuRequested(menuEvent -> {
+            if (!hasSelection) return;
+
             ContextMenu popupMenu = new ContextMenu();
             popupMenu.setAutoHide(true);
             activeMenu = popupMenu;
 
+            MenuItem cutItem = new MenuItem("Cut");
             MenuItem copyItem = new MenuItem("Copy");
             MenuItem pasteItem = new MenuItem("Paste");
             MenuItem cancelItem = new MenuItem("Cancel");
@@ -143,36 +181,39 @@ public class SelectHandles {
                 pasteItem.setDisable(true);
             }
 
-            //Copy to Clipboard
+            cutItem.setOnAction(e -> {
+                double x = bounds[0];
+                double y = bounds[1];
+                double w = bounds[2];
+                double h = bounds[3];
+
+                copyToClipboard(mainCanvas, x, y, w, h);
+                mainCanvas.getGraphicsContext2D().clearRect(x, y, w, h);
+
+                hasSelection = false;
+                activeMenu = null;
+            });
+
             copyItem.setOnAction(e -> {
-                copyToClipboard(mainCanvas, x, y, width, height);
+                copyToClipboard(mainCanvas, bounds[0], bounds[1], bounds[2], bounds[3]);
                 pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                 hasSelection = false;
                 activeMenu = null;
             });
 
-            //Paste
             pasteItem.setOnAction(e -> {
-                pasteFromClipboard(prevCanvas, x, y);
+                pasteFromClipboard(prevCanvas, bounds[0], bounds[1]);
                 activeMenu = null;
             });
 
-            //Cancel
             cancelItem.setOnAction(e -> {
                 pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                 hasSelection = false;
                 activeMenu = null;
             });
 
-            popupMenu.setOnHidden(e -> {
-                if (activeMenu != null) {
-                    pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-                    hasSelection = false;
-                }
-            });
-
-            popupMenu.getItems().addAll(copyItem, pasteItem, cancelItem);
-            popupMenu.show(prevCanvas, event.getScreenX(), event.getScreenY());
+            popupMenu.getItems().addAll(cutItem, copyItem, pasteItem, cancelItem);
+            popupMenu.show(prevCanvas, menuEvent.getScreenX(), menuEvent.getScreenY());
         });
     }
 
@@ -190,10 +231,7 @@ public class SelectHandles {
     }
 
     private static void pasteFromClipboard(Canvas prevCanvas, double x, double y) {
-        if (internalClipboard == null) {
-            System.out.println("Nothing to paste!");
-            return;
-        }
+        if (internalClipboard == null) {return;}
 
         isPastingMode = true;
         hasSelection = false;
@@ -222,5 +260,6 @@ public class SelectHandles {
         pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
 
         isPastingMode = false;
+        hasSelection = false;
     }
 }

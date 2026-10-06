@@ -6,9 +6,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.util.Optional;
 
@@ -20,7 +22,7 @@ import java.util.Optional;
 public class SideMenuHandles {
     static double startX, startY;
     static Boolean isDrawing = true;
-    
+
     //Mouse Free Draw
     static void drawLine(Group canvas, DrawSettings drawSettings, GraphicsContext gc) {
         canvas.setOnMousePressed(event -> {
@@ -47,7 +49,9 @@ public class SideMenuHandles {
         });
 
         prevCanvas.setOnMouseDragged(event -> {
-            if (!isDrawing) {return;}
+            if (!isDrawing) {
+                return;
+            }
 
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
             MiscHandles.applySettings(pgc, drawSettings, dashed);
@@ -56,7 +60,9 @@ public class SideMenuHandles {
         });
 
         prevCanvas.setOnMouseReleased(event -> {
-            if (!isDrawing) {return;}
+            if (!isDrawing) {
+                return;
+            }
             isDrawing = false;
 
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
@@ -78,6 +84,7 @@ public class SideMenuHandles {
             clearPixelsAt(event.getX(), event.getY(), gc, drawSettings.getSize());
         });
     }
+
     private static void clearPixelsAt(double x, double y, GraphicsContext gc, double brushSize) {
         // Calculate Brush Size
         double offset = brushSize / 2;
@@ -104,6 +111,38 @@ public class SideMenuHandles {
         });
     }
 
+    //Text Input
+    static void textTool(Group canvas, DrawSettings drawSettings, GraphicsContext gc, ToggleGroup toolToggle) {
+        canvas.setCursor(javafx.scene.Cursor.TEXT);
+
+        canvas.setOnMouseClicked(event -> {
+            //Pop-Up
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Text Tool");
+            dialog.setHeaderText("Enter the text you want to place on the canvas:");
+            dialog.setContentText("Text:");
+
+            //User Input
+            Optional<String> result = dialog.showAndWait();
+
+            result.ifPresent(text -> {
+                if (!text.trim().isEmpty()) {
+                    //Apply settings
+                    MiscHandles.applySettings(gc, drawSettings, false);
+
+                    //Dynamic font sizing
+                    gc.setFont(new Font("Arial", drawSettings.getSize() * 2));
+
+                    gc.fillText(text, event.getX(), event.getY());
+                }
+            });
+
+            // Reset interface
+            canvas.setCursor(javafx.scene.Cursor.DEFAULT);
+            canvas.setOnMouseClicked(null);
+            toolToggle.selectToggle(null);
+        });
+    }
     //Clear Canvas
     static void clearCanvas(TabFeature.TabRecord context, ActionEvent event) {
         Alert clearAlert = new Alert(Alert.AlertType.CONFIRMATION);

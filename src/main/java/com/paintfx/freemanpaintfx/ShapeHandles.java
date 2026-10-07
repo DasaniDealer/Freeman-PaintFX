@@ -64,13 +64,13 @@ public class ShapeHandles {
         prevCanvas.setOnMouseDragged(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
             MiscHandles.applySettings(pgc, drawSettings, dashed);
-            polygonRender(pgc, startX, startY, event.getX(), event.getY(), sides, filled);
+            MiscHandles.polygonRender(pgc, startX, startY, event.getX(), event.getY(), sides, filled);
         });
 
         prevCanvas.setOnMouseReleased(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
             MiscHandles.applySettings(gc, drawSettings, dashed);
-            polygonRender(gc, startX, startY, event.getX(), event.getY(), sides, filled);
+            MiscHandles.polygonRender(gc, startX, startY, event.getX(), event.getY(), sides, filled);
         });
     }
     //Circle Function
@@ -147,30 +147,37 @@ public class ShapeHandles {
             gc.strokeOval(x, y, width, height);
         });
     }
-    //Polygon Renderer
-    private static void polygonRender(GraphicsContext context, double startX, double startY,
-                                      double currentX, double currentY, int sides, boolean isFilled) {
 
-        double dx = currentX - startX;
-        double dy = currentY - startY;
-        double radius = Math.sqrt(dx * dx + dy * dy);
+    public static void rightTriangleDraw(Canvas mainCanvas, Canvas prevCanvas, DrawSettings drawSettings,
+                                         boolean filled, boolean dashed) {
+        GraphicsContext gc = mainCanvas.getGraphicsContext2D();
+        GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
 
-        if (radius < 1) return;
+        prevCanvas.setOnMousePressed(event -> {
+            startX = event.getX();
+            startY = event.getY();
+        });
 
-        double[] xPoints = new double[sides];
-        double[] yPoints = new double[sides];
+        prevCanvas.setOnMouseDragged(event -> {
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            MiscHandles.applySettings(pgc, drawSettings, dashed);
 
-        double startAngle = Math.atan2(dy, dx);
+            double[] xPoints = {startX, startX, event.getX()};
+            double[] yPoints = {startY, event.getY(), event.getY()};
 
-        for (int i = 0; i < sides; i++) {
-            double angle = startAngle + (i * 2 * Math.PI / sides);
-            xPoints[i] = startX + radius * Math.cos(angle);
-            yPoints[i] = startY + radius * Math.sin(angle);
-        }
+            if (filled) { pgc.fillPolygon(xPoints, yPoints, 3); }
+            pgc.strokePolygon(xPoints, yPoints, 3);
+        });
 
-        if (isFilled) {
-            context.fillPolygon(xPoints, yPoints, sides);
-        }
-        context.strokePolygon(xPoints, yPoints, sides);
+        prevCanvas.setOnMouseReleased(event -> {
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            MiscHandles.applySettings(gc, drawSettings, dashed);
+
+            double[] xPoints = {startX, startX, event.getX()};
+            double[] yPoints = {startY, event.getY(), event.getY()};
+
+            if (filled) { gc.fillPolygon(xPoints, yPoints, 3); }
+            gc.strokePolygon(xPoints, yPoints, 3);
+        });
     }
 }

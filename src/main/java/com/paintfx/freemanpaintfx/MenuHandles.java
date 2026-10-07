@@ -122,7 +122,7 @@ public class MenuHandles {
         popupRoot.setAlignment(Pos.CENTER);
         popupRoot.setStyle("-fx-padding: 15; " + "-fx-background-color: #D3D3D3;");
 
-        Label titleLabel = new Label("Freeman PaintFX v4.0.0");
+        Label titleLabel = new Label("Freeman PaintFX v4.6.0");
         titleLabel.setStyle("-fx-font-weight: bold;" + "-fx-font-size: 24px;");
 
         Label descriptionLabel = new Label("Previous Versions: https://github.com/DasaniDealer/Freeman-PaintFX");

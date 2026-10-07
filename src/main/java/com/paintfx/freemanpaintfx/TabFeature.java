@@ -23,10 +23,15 @@ public class TabFeature {
 
         Group canvasContainer = new Group();
 
-        Canvas mainCanvas = new Canvas(1150, 650);
+        //Find Monitor Bounds
+        javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
+        double monitorWidth = screenBounds.getWidth();
+        double monitorHeight = screenBounds.getHeight();
+
+        Canvas mainCanvas = new Canvas(monitorWidth, monitorHeight);
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
 
-        Canvas prevCanvas = new Canvas(1150, 650);
+        Canvas prevCanvas = new Canvas(monitorWidth, monitorHeight);
         GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
 
         canvasContainer.getChildren().addAll(mainCanvas,prevCanvas);

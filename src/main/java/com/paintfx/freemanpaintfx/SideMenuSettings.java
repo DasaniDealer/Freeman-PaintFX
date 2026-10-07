@@ -1,6 +1,5 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -49,6 +48,8 @@ public class SideMenuSettings {
 
         RadioMenuItem triangleButton = new RadioMenuItem("Triangle");
         RadioMenuItem dashTriangleButton = new RadioMenuItem("Dashed Triangle");
+        RadioMenuItem rightTriangleButton = new RadioMenuItem("Right Triangle");
+        RadioMenuItem dashRightTriangleButton = new RadioMenuItem("Dashed Right Triangle");
 
         RadioMenuItem circleButton = new RadioMenuItem("Circle");
         RadioMenuItem dashCircleButton = new RadioMenuItem("Dashed Circle");
@@ -58,6 +59,7 @@ public class SideMenuSettings {
         RadioMenuItem fillSquareButton = new RadioMenuItem("Filled Square");
         RadioMenuItem fillRectButton = new RadioMenuItem("Filled Rectangle");
         RadioMenuItem fillTriangleButton = new RadioMenuItem("Filled Triangle");
+        RadioMenuItem fillRightTriangleButton = new RadioMenuItem("Filled Right Triangle");
         RadioMenuItem fillCircleButton = new RadioMenuItem("Filled Circle");
         RadioMenuItem fillEllipseButton = new RadioMenuItem("Filled Ellipse");
         //Custom Polygon Button
@@ -87,6 +89,7 @@ public class SideMenuSettings {
         shapeToggle.getToggles().addAll(squareButton, dashSquareButton, fillSquareButton,
                 rectButton, dashRectButton, fillRectButton,
                 triangleButton, dashTriangleButton, fillTriangleButton,
+                rightTriangleButton, dashRightTriangleButton, fillRightTriangleButton,
                 circleButton, dashCircleButton, fillCircleButton,
                 ellipseButton, dashEllipseButton, fillEllipseButton);
 
@@ -129,9 +132,9 @@ public class SideMenuSettings {
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
-        shapeMenu.getItems().addAll(squareButton, rectButton, triangleButton, circleButton, ellipseButton);
-        dashMenu.getItems().addAll(dashSquareButton, dashRectButton, dashTriangleButton, dashCircleButton, dashEllipseButton);
-        fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillCircleButton, fillEllipseButton);
+        shapeMenu.getItems().addAll(squareButton, rectButton, triangleButton, rightTriangleButton, circleButton, ellipseButton);
+        dashMenu.getItems().addAll(dashSquareButton, dashRectButton, dashTriangleButton, dashRightTriangleButton, dashCircleButton, dashEllipseButton);
+        fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillRightTriangleButton, fillCircleButton, fillEllipseButton);
         polygonMenu.getItems().addAll(polygonButton, dashPolygonButton, fillPolygonButton);
 
         //Tool Buttons
@@ -153,7 +156,7 @@ public class SideMenuSettings {
 
                 //Toggle Button Effects
                 if (newToggle == selectButton) {
-                    SelectHandles.selectionTool(context.mainCanvas(), context.prevCanvas());
+                    SelectSettings.selectionTool(context.mainCanvas(), context.prevCanvas());
                 } else if (newToggle == pencilButton) {
                     SideMenuHandles.drawLine(context.canvasContainer(), drawSettings, context.gc());
                 } else if (newToggle == eraserButton) {
@@ -247,6 +250,15 @@ public class SideMenuSettings {
                 } else if (newToggle == dashTriangleButton) {
                     ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
                             false, true, 3);
+                } else if (newToggle == rightTriangleButton) {
+                    ShapeHandles.rightTriangleDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false);
+                } else if (newToggle == fillRightTriangleButton) {
+                    ShapeHandles.rightTriangleDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false);
+                } else if (newToggle == dashRightTriangleButton) {
+                    ShapeHandles.rightTriangleDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true);
                 } else if (newToggle == circleButton) {
                     ShapeHandles.circleDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
                             false, false);

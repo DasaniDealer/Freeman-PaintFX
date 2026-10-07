@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 
 import static com.paintfx.freemanpaintfx.SideMenuHandles.isDrawing;
 
-public class SelectHandles {
+public class SelectSettings {
     private static double startX;
     private static double startY;
     private static boolean hasSelection = false;

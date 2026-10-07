@@ -190,6 +190,7 @@ public class SelectSettings {
 
                 copyToClipboard(mainCanvas, x, y, w, h);
                 mainCanvas.getGraphicsContext2D().clearRect(x, y, w, h);
+                prevCanvas.getGraphicsContext2D().clearRect(x, y, w, h);
 
                 hasSelection = false;
                 activeMenu = null;

@@ -36,6 +36,7 @@ public class MiscHandles {
         prevCanvas.setOnMouseDragged(null);
         prevCanvas.setOnMouseReleased(null);
 
+        context.pgc().clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
         SelectSettings.commitPaste(context.mainCanvas(), context.prevCanvas());
     }
 

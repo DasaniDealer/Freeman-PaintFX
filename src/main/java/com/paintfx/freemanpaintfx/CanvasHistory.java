@@ -1,6 +1,5 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.geometry.Rectangle2D;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.WritableImage;
@@ -8,7 +7,7 @@ import javafx.scene.paint.Color;
 import java.util.Stack;
 
 public class CanvasHistory {
-    // Stacks to track Undo and Redo states as snapshots
+    //Stacks to track Undo and Redo states as snapshots
     private static final Stack<WritableImage> undoStack = new Stack<>();
     private static final Stack<WritableImage> redoStack = new Stack<>();
 
@@ -36,7 +35,6 @@ public class CanvasHistory {
     public static void undo(Canvas mainCanvas) {
         if (undoStack.isEmpty() || mainCanvas == null) return;
 
-        // Push current state to redo stack before applying the undo change
         int width = (int) mainCanvas.getWidth();
         int height = (int) mainCanvas.getHeight();
         SnapshotParameters params = new SnapshotParameters();
@@ -45,7 +43,6 @@ public class CanvasHistory {
         mainCanvas.snapshot(params, currentSnapshot);
         redoStack.push(currentSnapshot);
 
-        // Pop previous state and draw it
         WritableImage previousState = undoStack.pop();
         restoreCanvas(mainCanvas, previousState);
     }
@@ -53,7 +50,6 @@ public class CanvasHistory {
     public static void redo(Canvas mainCanvas) {
         if (redoStack.isEmpty() || mainCanvas == null) return;
 
-        // Push current state back to undo stack before restoring
         int width = (int) mainCanvas.getWidth();
         int height = (int) mainCanvas.getHeight();
         SnapshotParameters params = new SnapshotParameters();
@@ -62,7 +58,6 @@ public class CanvasHistory {
         mainCanvas.snapshot(params, currentSnapshot);
         undoStack.push(currentSnapshot);
 
-        // Pop next state and draw it
         WritableImage nextState = redoStack.pop();
         restoreCanvas(mainCanvas, nextState);
     }

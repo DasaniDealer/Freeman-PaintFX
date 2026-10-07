@@ -202,6 +202,7 @@ public class SideMenuSettings {
         clearButton.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                MiscHandles.clearListeners(context);
                 SideMenuHandles.clearCanvas(context, event);
             }
         });

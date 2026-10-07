@@ -51,7 +51,7 @@ public class MenuHandles {
                 record.gc().clearRect(0, 0, width, height);
                 record.pgc().clearRect(0, 0, width, height);
 
-
+                CanvasHistory.clearHistory();
             } catch (Exception error) {
                 System.err.println("Error loading image file: " + error.getMessage());
                 error.printStackTrace();

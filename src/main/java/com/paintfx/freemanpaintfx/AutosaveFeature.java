@@ -7,7 +7,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.WritableImage;
 import javafx.util.Duration;
-
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
@@ -43,5 +42,12 @@ public class AutosaveFeature {
 
         saveThread.setDaemon(true);
         saveThread.start();
+    }
+
+    public static void stopAutosave() {
+        if (autosaveTimeline != null) {
+            autosaveTimeline.stop();
+            System.out.println("Autosave disabled.");
+        }
     }
 }

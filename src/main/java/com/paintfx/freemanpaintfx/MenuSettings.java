@@ -8,8 +8,12 @@ import javafx.scene.input.KeyCombination;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
+import java.io.File;
 
-public class MenuSettings extends MenuBar{
+
+public class MenuSettings extends MenuBar {
+    private final int currentSeconds = 60;
+
     public MenuSettings(Stage primaryStage, TabPane tabPane, DrawSettings drawSettings) {
         //Menu Bar
         Menu file = new Menu("File");
@@ -25,6 +29,10 @@ public class MenuSettings extends MenuBar{
         MenuItem saveAsImage = new MenuItem("Save As");
 
         file.getItems().addAll(openImage, saveImage, saveAsImage);
+
+        //Autosave Submenu
+        CheckMenuItem toggleAutosave = new CheckMenuItem("Enable Autosave");
+        options.getItems().addAll(toggleAutosave);
 
         //Tabs Submenu
         MenuItem addTab = new MenuItem("Add Tab");
@@ -64,6 +72,31 @@ public class MenuSettings extends MenuBar{
             }
         });
         saveAsImage.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN));
+
+        //Autosave
+        toggleAutosave.selectedProperty().addListener((obs, oldVal, isNowSelected) -> {
+            if (isNowSelected) {
+                Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+                if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                    AutosaveFeature.startAutosaveTimer(context.mainCanvas(), currentSeconds);
+                } else {
+                    AutosaveFeature.stopAutosave();
+                };
+            } else {
+                AutosaveFeature.stopAutosave();
+            }
+        });
+
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (toggleAutosave.isSelected()) {
+                Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+                if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                    AutosaveFeature.startAutosaveTimer(context.mainCanvas(), currentSeconds);
+                } else {
+                    AutosaveFeature.stopAutosave();
+                }
+            }
+        });
 
         //Tab Features
         addTab.setOnAction(event -> {

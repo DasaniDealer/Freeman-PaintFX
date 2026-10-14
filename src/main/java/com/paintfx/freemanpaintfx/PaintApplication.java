@@ -46,7 +46,7 @@ public class PaintApplication extends Application {
     public void stop() {
         //Clean up the timer when the application closes
         if (AutosaveFeature.autosaveTimeline != null) {
-            AutosaveFeature.autosaveTimeline.stop();
+            AutosaveFeature.stopAutosave();
         }
     }
 

@@ -11,6 +11,7 @@ module com.paintfx.freemanpaintfx {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires javafx.swing;
+    requires jdk.httpserver;
 
     opens com.paintfx.freemanpaintfx to javafx.fxml;
     exports com.paintfx.freemanpaintfx;

@@ -34,7 +34,18 @@ public class PaintApplication extends Application {
         root.setRight(sideMenu.getView());
         root.setCenter(tabPane);
 
+        //Tab Add
         TabFeature.addTab(tabPane);
+
+        //Webserver Add
+        WebserverFeature webserver = new WebserverFeature();
+        try {
+            webserver.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        MenuSettings.setServerInstance(webserver);
 
         //SHOWTIME
         Scene scene = new Scene(root, 1150, 650);

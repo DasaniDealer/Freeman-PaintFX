@@ -8,13 +8,19 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TabFeature {
     private static int tabCount = 0;
 
+    public static final Map<String, Canvas> sharedCanvases = new HashMap<>();
+    private static WebserverFeature serverInstance;
+
     public static void addTab(TabPane tabPane) {
         tabCount++;
-
-        Tab newTab = new Tab("Tab " + tabCount);
+        String tabTitle = "Tab " + tabCount;
+        Tab newTab = new Tab(tabTitle);
 
         //Image & Canvas Create
         ImageView imageView = new ImageView();
@@ -49,6 +55,16 @@ public class TabFeature {
         imagePane.setFitToHeight(true);
         imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+        //Remove From Webserver
+        newTab.setOnClosed(event -> {
+            //Remove from shared inventory
+            sharedCanvases.remove(tabTitle);
+
+            if (serverInstance != null) {
+                serverInstance.updateSelection(sharedCanvases);
+            }
+        });
 
         newTab.setUserData(new TabRecord(
                 imageView,

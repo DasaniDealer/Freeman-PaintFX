@@ -8,11 +8,15 @@ import javafx.scene.input.KeyCombination;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
-import java.io.File;
-
 
 public class MenuSettings extends MenuBar {
     private final int currentSeconds = 60;
+
+    private static WebserverFeature serverInstance;
+
+    public static void setServerInstance(WebserverFeature server) {
+        serverInstance = server;
+    }
 
     public MenuSettings(Stage primaryStage, TabPane tabPane, DrawSettings drawSettings) {
         //Menu Bar
@@ -30,9 +34,10 @@ public class MenuSettings extends MenuBar {
 
         file.getItems().addAll(openImage, saveImage, saveAsImage);
 
-        //Autosave Submenu
+        //Options Submenu
         CheckMenuItem toggleAutosave = new CheckMenuItem("Enable Autosave");
-        options.getItems().addAll(toggleAutosave);
+        CheckMenuItem shareImage = new CheckMenuItem("Share to Webserver");
+        options.getItems().addAll(toggleAutosave, shareImage);
 
         //Tabs Submenu
         MenuItem addTab = new MenuItem("Add Tab");
@@ -87,14 +92,40 @@ public class MenuSettings extends MenuBar {
             }
         });
 
+        //Share to Webserver
+        shareImage.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                String tabTitle = activeTab.getText();
+
+                if (shareImage.isSelected()) {
+                    TabFeature.sharedCanvases.put(tabTitle, context.mainCanvas());
+                } else {
+                    TabFeature.sharedCanvases.remove(tabTitle);
+                }
+
+                if (serverInstance != null) {
+                    serverInstance.updateSelection(TabFeature.sharedCanvases);
+                }
+            }
+        });
+
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            //Handle Autosave Tab Switching
             if (toggleAutosave.isSelected()) {
-                Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
-                if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                if (newTab != null && newTab.getUserData() instanceof TabFeature.TabRecord context) {
                     AutosaveFeature.startAutosaveTimer(context.mainCanvas(), currentSeconds);
                 } else {
                     AutosaveFeature.stopAutosave();
                 }
+            }
+
+            if (newTab != null) {
+                String tabTitle = newTab.getText();
+                boolean isShared = TabFeature.sharedCanvases.containsKey(tabTitle);
+                shareImage.setSelected(isShared);
+            } else {
+                shareImage.setSelected(false);
             }
         });
 

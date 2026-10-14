@@ -69,8 +69,15 @@ public class SideMenuSettings {
         RadioMenuItem polygonButton = new RadioMenuItem("Polygon");
         RadioMenuItem dashPolygonButton = new RadioMenuItem("Dashed Polygon");
         RadioMenuItem fillPolygonButton = new RadioMenuItem("Filled Polygon");
-        Spinner<Integer> sideSpinner = new Spinner<>(3, 20, 5);
-        sideSpinner.setEditable(true);
+        Spinner<Integer> polygonSpinner = new Spinner<>(3, 20, 5);
+        polygonSpinner.setEditable(true);
+
+        RadioMenuItem starButton = new RadioMenuItem("Star");
+        RadioMenuItem dashStarButton = new RadioMenuItem("Dashed Star");
+        RadioMenuItem fillStarButton = new RadioMenuItem("Filled Star");
+        Spinner<Integer> starSpinner = new Spinner<>(3, 20, 5);
+        starSpinner.setEditable(true);
+
 
         //Menu Groups
         MenuButton lineMenu = new MenuButton("Line");
@@ -78,6 +85,7 @@ public class SideMenuSettings {
         MenuButton dashMenu = new MenuButton("Dashed Shape");
         MenuButton fillShapeMenu = new MenuButton("Filled Shape");
         MenuButton polygonMenu = new MenuButton("Polygon");
+        MenuButton starMenu = new MenuButton("Star");
 
         //Toggle Groups
         ToggleGroup toolToggle = new ToggleGroup();
@@ -86,6 +94,7 @@ public class SideMenuSettings {
         toolToggle.getToggles().addAll(selectButton, pencilButton, eraserButton,
                 textButton, grabButton,
                 polygonButton, dashPolygonButton, fillPolygonButton,
+                starButton, dashStarButton, fillStarButton,
                 lineButton, dashButton);
 
         //Shape Menu
@@ -101,10 +110,19 @@ public class SideMenuSettings {
         HBox polygonBox = new HBox(5);
         polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        sideSpinner.setPrefWidth(75);
+        polygonSpinner.setPrefWidth(75);
         polygonMenu.setPrefWidth(110);
 
-        polygonBox.getChildren().addAll(sideSpinner, polygonMenu);
+        polygonBox.getChildren().addAll(polygonSpinner, polygonMenu);
+
+        //Polygon HBox
+        HBox starBox = new HBox(5);
+        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        starSpinner.setPrefWidth(75);
+        starMenu.setPrefWidth(110);
+
+        starBox.getChildren().addAll(starSpinner, starMenu);
 
         //Undo Redo HBox
         HBox undoRedoBox = new HBox(10);
@@ -132,7 +150,7 @@ public class SideMenuSettings {
                 toolsLabel, undoRedoBox,
                 selectButton, pencilButton, eraserButton, textButton, clearButton,
                 lineMenu, shapeMenu, dashMenu, fillShapeMenu,
-                polygonBox, drawSettings
+                polygonBox, starBox, drawSettings
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
@@ -140,6 +158,7 @@ public class SideMenuSettings {
         dashMenu.getItems().addAll(dashSquareButton, dashRectButton, dashTriangleButton, dashRightTriangleButton, dashPentagonButton, dashCircleButton, dashEllipseButton);
         fillShapeMenu.getItems().addAll(fillSquareButton, fillRectButton, fillTriangleButton, fillRightTriangleButton, fillPentagonButton, fillCircleButton, fillEllipseButton);
         polygonMenu.getItems().addAll(polygonButton, dashPolygonButton, fillPolygonButton);
+        starMenu.getItems().addAll(starButton, dashStarButton, fillStarButton);
 
         //Tool Buttons
         toolToggle.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
@@ -171,13 +190,22 @@ public class SideMenuSettings {
                     SideMenuHandles.grabColor(context.canvasContainer(), drawSettings, toolToggle);
                 } else if (newToggle == polygonButton) {
                     ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
-                            false, false, sideSpinner.getValue());
+                            false, false, polygonSpinner.getValue());
                 } else if (newToggle == dashPolygonButton) {
                     ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
-                            false, true, sideSpinner.getValue());
+                            false, true, polygonSpinner.getValue());
                 } else if (newToggle == fillPolygonButton) {
                     ShapeHandles.polygonDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
-                            true, false, sideSpinner.getValue());
+                            true, false, polygonSpinner.getValue());
+                } else if (newToggle == starButton) {
+                    ShapeHandles.starDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, false, starSpinner.getValue());
+                } else if (newToggle == dashStarButton) {
+                    ShapeHandles.starDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            false, true, starSpinner.getValue());
+                } else if (newToggle == fillStarButton) {
+                    ShapeHandles.starDraw(context.mainCanvas(), context.prevCanvas(), drawSettings,
+                            true, false, starSpinner.getValue());
                 } else if (newToggle == lineButton) {
                     SideMenuHandles.drawStraight(context.mainCanvas(), context.prevCanvas(), drawSettings, false);
                 } else if (newToggle == dashButton) {

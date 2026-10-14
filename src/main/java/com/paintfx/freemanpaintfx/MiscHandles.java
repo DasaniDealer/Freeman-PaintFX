@@ -93,4 +93,32 @@ public class MiscHandles {
         }
         context.strokePolygon(xPoints, yPoints, sides);
     }
+
+    public static void starRender(GraphicsContext gc, double cx, double cy, int points, double rOuter, double rInner, boolean filled) {
+        // Total vertices = outer points + inner valleys
+        int totalVertices = points * 2;
+        double[] xPoints = new double[totalVertices];
+        double[] yPoints = new double[totalVertices];
+
+        // Each step rotates by a fraction of 360 degrees (in radians)
+        double angleStep = Math.PI / points;
+
+        // Start pointing straight up (-90 degrees or -PI/2)
+        double startAngle = -Math.PI / 2;
+
+        for (int i = 0; i < totalVertices; i++) {
+            // Alternate between outer radius and inner radius
+            double currentRadius = (i % 2 == 0) ? rOuter : rInner;
+            double currentAngle = startAngle + (i * angleStep);
+
+            // Trigonometry to find vertex positions
+            xPoints[i] = cx + Math.cos(currentAngle) * currentRadius;
+            yPoints[i] = cy + Math.sin(currentAngle) * currentRadius;
+        }
+
+        if (filled) {
+            gc.fillPolygon(xPoints, yPoints, totalVertices);
+        }
+        gc.strokePolygon(xPoints, yPoints, totalVertices);
+    }
 }

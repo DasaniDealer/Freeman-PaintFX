@@ -43,6 +43,13 @@ public class PaintApplication extends Application {
         primaryStage.show();
     }
 
+    public void stop() {
+        //Clean up the timer when the application closes
+        if (AutosaveFeature.autosaveTimeline != null) {
+            AutosaveFeature.autosaveTimeline.stop();
+        }
+    }
+
     /**
      * @param args Main execution method
      */

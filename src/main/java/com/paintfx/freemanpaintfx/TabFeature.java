@@ -41,6 +41,9 @@ public class TabFeature {
 
         ScrollPane imagePane = new ScrollPane(combineArea);
 
+        //Autosaving
+        AutosaveFeature.startAutosaveTimer(mainCanvas, 60);
+
         imagePane.setPannable(false);
         imagePane.setFitToWidth(true);
         imagePane.setFitToHeight(true);

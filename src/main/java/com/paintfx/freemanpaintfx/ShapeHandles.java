@@ -180,4 +180,36 @@ public class ShapeHandles {
             gc.strokePolygon(xPoints, yPoints, 3);
         });
     }
+
+    public static void starDraw(Canvas mainCanvas, Canvas prevCanvas, DrawSettings drawSettings, boolean filled, boolean dashed, int points) {
+        GraphicsContext gc = mainCanvas.getGraphicsContext2D();
+        GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
+
+        prevCanvas.setOnMousePressed(event -> {
+            startX = event.getX();
+            startY = event.getY();
+        });
+
+        prevCanvas.setOnMouseDragged(event -> {
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            MiscHandles.applySettings(pgc, drawSettings, dashed);
+
+            // Calculate outer radius based on mouse drag distance
+            double rOuter = Math.hypot(event.getX() - startX, event.getY() - startY);
+            // The inner radius looks best at roughly 40% to 50% of the outer radius
+            double rInner = rOuter * 0.45;
+
+            MiscHandles.starRender(pgc, startX, startY, points, rOuter, rInner, filled);
+        });
+
+        prevCanvas.setOnMouseReleased(event -> {
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            MiscHandles.applySettings(gc, drawSettings, dashed);
+
+            double rOuter = Math.hypot(event.getX() - startX, event.getY() - startY);
+            double rInner = rOuter * 0.45;
+
+            MiscHandles.starRender(gc, startX, startY, points, rOuter, rInner, filled);
+        });
+    }
 }

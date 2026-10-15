@@ -26,13 +26,13 @@ public class SideMenuHandlesTest {
     void grabColor() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
 
-        // Force the execution inside the JavaFX Application Thread
+        //Application Thread Run
         Platform.runLater(() -> {
             try {
                 Group canvas = new Group();
                 ToggleGroup toolToggle = new ToggleGroup();
 
-                // DrawSettings
+                //DrawSettings
                 DrawSettings drawSettings = new DrawSettings();
                 ColorPicker colorPicker = new ColorPicker(Color.BLUE); // Safe here!
                 drawSettings.setColorPicker(colorPicker);
@@ -50,17 +50,17 @@ public class SideMenuHandlesTest {
 
                 canvas.getOnMouseClicked().handle(fakeClick);
 
-                // Print Results
+                //Print Results
                 System.out.println("Updated Color Picker value: " + colorPicker.getValue());
                 System.out.println("Canvas Cursor state (Should be DEFAULT): " + canvas.getCursor());
                 System.out.println("Active Toggle State (Should be null): " + toolToggle.getSelectedToggle());
                 System.out.println("TEST END");
 
             } finally {
-                latch.countDown(); // Ensure the latch counts down even if an assertion fails
+                latch.countDown();
             }
         });
 
-        latch.await(); // Make the JUnit thread wait for JavaFX to finish the test
+        latch.await();
     }
 }

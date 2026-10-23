@@ -1,5 +1,6 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
@@ -60,9 +61,13 @@ public class MenuSettings extends MenuBar {
         saveImage.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                WritableImage combineImage = context.combineArea().snapshot(null, null);
-                MenuHandles.handleSave(combineImage, primaryStage);
-                PaintApplication.isSaved = true;
+                Canvas currentCanvas = context.mainCanvas();
+
+                if (currentCanvas != null) {
+                    WritableImage canvasImage = currentCanvas.snapshot(null, null);
+                    MenuHandles.handleSave(canvasImage, primaryStage);
+                    PaintApplication.isSaved = true; // Note: Handled inside MenuHandles, but safe to keep
+                }
             }
         });
         saveImage.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN));
@@ -71,9 +76,13 @@ public class MenuSettings extends MenuBar {
         saveAsImage.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                WritableImage combineImage = context.combineArea().snapshot(null, null);
-                MenuHandles.handleSaveAs(combineImage, primaryStage);
-                PaintApplication.isSaved = true;
+                Canvas currentCanvas = context.mainCanvas();
+
+                if (currentCanvas != null) {
+                    WritableImage canvasImage = currentCanvas.snapshot(null, null);
+                    MenuHandles.handleSaveAs(canvasImage, primaryStage);
+                    PaintApplication.isSaved = true; // Note: Handled inside MenuHandles, but safe to keep
+                }
             }
         });
         saveAsImage.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN));

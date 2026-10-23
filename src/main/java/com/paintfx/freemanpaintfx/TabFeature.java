@@ -1,5 +1,6 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.animation.Timeline;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -30,37 +31,39 @@ public class TabFeature {
         Group canvasContainer = new Group();
 
         //Find Monitor Bounds
-        javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
-        double monitorWidth = screenBounds.getWidth();
-        double monitorHeight = screenBounds.getHeight();
-
-        Canvas mainCanvas = new Canvas(monitorWidth, monitorHeight);
+        Canvas mainCanvas = new Canvas(1150, 650);
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
 
-        Canvas prevCanvas = new Canvas(monitorWidth, monitorHeight);
+        Canvas prevCanvas = new Canvas(1150, 650);
         GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
 
         canvasContainer.getChildren().addAll(mainCanvas,prevCanvas);
 
+        gc.setFill(javafx.scene.paint.Color.WHITE);
+        gc.fillRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);
 
         ScrollPane imagePane = new ScrollPane(combineArea);
 
         //Autosaving
-        AutosaveFeature.startAutosaveTimer(mainCanvas, 60);
+        Timeline tabTimeline = AutosaveFeature.startAutosaveTimer(mainCanvas, 60);
 
         imagePane.setPannable(false);
         imagePane.setFitToWidth(true);
         imagePane.setFitToHeight(true);
+        imagePane.setStyle("-fx-background: #2b2b2b;");
         imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
         //Remove From Webserver
         newTab.setOnClosed(event -> {
-            //Remove from shared inventory
-            sharedCanvases.remove(tabTitle);
+            if (tabTimeline != null) {
+                tabTimeline.stop();
+                System.out.println("Autosave stopped for: " + tabTitle);
+            }
 
+            sharedCanvases.remove(tabTitle);
             if (serverInstance != null) {
                 serverInstance.updateSelection(sharedCanvases);
             }
@@ -79,6 +82,11 @@ public class TabFeature {
         newTab.setContent(imagePane);
         tabPane.getTabs().add(newTab);
         tabPane.getSelectionModel().select(newTab);
+
+        sharedCanvases.put(tabTitle, mainCanvas);
+        if (serverInstance != null) {
+            serverInstance.updateSelection(sharedCanvases);
+        }
     }
 
     public record TabRecord(

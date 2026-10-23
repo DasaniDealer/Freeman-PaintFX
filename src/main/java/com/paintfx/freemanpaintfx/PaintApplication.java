@@ -59,6 +59,9 @@ public class PaintApplication extends Application {
         if (AutosaveFeature.autosaveTimeline != null) {
             AutosaveFeature.stopAutosave();
         }
+        //Close System on Exit
+        javafx.application.Platform.exit();
+        System.exit(0);
     }
 
     /**

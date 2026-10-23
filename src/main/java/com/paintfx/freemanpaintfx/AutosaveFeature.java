@@ -14,15 +14,16 @@ import java.io.IOException;
 public class AutosaveFeature {
     public static Timeline autosaveTimeline;
 
-    public static void startAutosaveTimer(Canvas canvas, int seconds) {
+    public static Timeline startAutosaveTimer(Canvas canvas, int seconds) {
         KeyFrame keyFrame = new KeyFrame(
                 Duration.seconds(seconds),
                 event -> canvasSnapshot(canvas)
         );
 
-        autosaveTimeline = new Timeline(keyFrame);
-        autosaveTimeline.setCycleCount(Animation.INDEFINITE);
-        autosaveTimeline.play();
+        Timeline timeline = new Timeline(keyFrame);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        return timeline;
     }
 
     private static void canvasSnapshot(Canvas canvas){

@@ -8,7 +8,7 @@ import javafx.scene.robot.Robot;
 
 public class DrawSettings extends VBox {
 
-    private final ColorPicker colorPicker;
+    private ColorPicker colorPicker;
     private final Slider sizeSlider;
     private final Robot colorGrab;
     private final ToggleButton grabberButton;
@@ -47,4 +47,9 @@ public class DrawSettings extends VBox {
     public double getSize() { return sizeSlider.getValue();}
     public Robot getColorGrab() {return colorGrab;}
     public ToggleButton getGrabButton() {return grabberButton;}
+
+    public ColorPicker setColorPicker(ColorPicker colorPicker) {
+        colorPicker = this.colorPicker;
+        return colorPicker;
+    }
 }

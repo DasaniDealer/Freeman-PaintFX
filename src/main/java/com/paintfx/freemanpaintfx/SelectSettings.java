@@ -19,6 +19,12 @@ public class SelectSettings {
     private static boolean hasSelection = false;
     private static boolean isDraggingSelection = false;
 
+    //Context Menu
+    private static ContextMenu activeMenu = null;
+    private static WritableImage internalClipboard = null;
+    private static boolean isPastingMode = false;
+    private static double pasteX, pasteY;
+
     //Snapshot Image
     static javafx.scene.image.WritableImage selectionSnapshot = null;
     static double selectX, selectY;
@@ -32,6 +38,11 @@ public class SelectSettings {
         pgc.setImageSmoothing(false);
 
         prevCanvas.setOnMousePressed(event -> {
+            if (activeMenu != null) {
+                activeMenu.hide();
+                activeMenu = null;
+            }
+
             if (selectionSnapshot != null &&
                     event.getX() >= selectX && event.getX() <= (selectX + selectW) &&
                     event.getY() >= selectY && event.getY() <= (selectY + selectH)) {
@@ -44,6 +55,7 @@ public class SelectSettings {
                 if (selectionSnapshot != null) {
                     gc.drawImage(selectionSnapshot, selectX, selectY);
                     selectionSnapshot = null;
+                    isPastingMode = false;
                     pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                 }
 
@@ -64,10 +76,15 @@ public class SelectSettings {
 
                 double x = Math.min(startX, event.getX());
                 double y = Math.min(startY, event.getY());
-                double weight = Math.abs(startX - event.getX());
+                double width = Math.abs(startX - event.getX());
                 double height = Math.abs(startY - event.getY());
 
-                pgc.strokeRect(x, y, weight, height);
+                pgc.strokeRect(x, y, width, height);
+
+                selectX = x;
+                selectY = y;
+                selectW = width;
+                selectH = height;
             } else if (isDraggingSelection && selectionSnapshot != null) {
                 double dx = event.getX() - dragX;
                 double dy = event.getY() - dragY;
@@ -80,7 +97,6 @@ public class SelectSettings {
                 //Re-render Snapshot Image
                 pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                 pgc.drawImage(selectionSnapshot, selectX, selectY);
-
                 pgc.setStroke(Color.BLUE);
                 pgc.setLineWidth(1);
                 pgc.setLineDashes(5.0);
@@ -90,7 +106,6 @@ public class SelectSettings {
 
         prevCanvas.setOnMouseReleased(event -> {
             if (hasSelection) {
-                hasSelection = false;
                 endX = event.getX();
                 endY = event.getY();
 
@@ -121,12 +136,93 @@ public class SelectSettings {
                     pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                     selectionSnapshot = null;
                 }
+                hasSelection = false;
             } else if (isDraggingSelection) {
                 isDraggingSelection = false;
             }
         });
 
+        //Pop-Up Menu
+        prevCanvas.setOnContextMenuRequested(menuEvent -> {
+            if (selectionSnapshot == null && selectW <= 1) return;
 
+            ContextMenu popupMenu = new ContextMenu();
+            popupMenu.setAutoHide(true);
+            activeMenu = popupMenu;
+
+            MenuItem cutItem = new MenuItem("Cut");
+            MenuItem copyItem = new MenuItem("Copy");
+            MenuItem pasteItem = new MenuItem("Paste");
+            MenuItem cancelItem = new MenuItem("Cancel");
+
+            if (internalClipboard == null) {
+                pasteItem.setDisable(true);
+            }
+
+            cutItem.setOnAction(e -> {
+                CanvasHistory.saveState(mainCanvas);
+
+                internalClipboard = selectionSnapshot;
+
+                selectionSnapshot = null;
+                pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+                activeMenu = null;
+            });
+
+            copyItem.setOnAction(e -> {
+                internalClipboard = selectionSnapshot;
+
+                if (selectionSnapshot != null) {
+                    gc.drawImage(selectionSnapshot, selectX, selectY);
+                }
+                pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+                selectionSnapshot = null;
+                activeMenu = null;
+            });
+
+            pasteItem.setOnAction(e -> {
+                pasteFromClipboard(prevCanvas, selectX, selectY);
+                activeMenu = null;
+            });
+
+            cancelItem.setOnAction(e -> {
+                if (selectionSnapshot != null) {
+                    gc.drawImage(selectionSnapshot, selectX, selectY);
+                    selectionSnapshot = null;
+                }
+                pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+                activeMenu = null;
+            });
+
+            popupMenu.getItems().addAll(cutItem, copyItem, pasteItem, cancelItem);
+            popupMenu.show(prevCanvas, menuEvent.getScreenX(), menuEvent.getScreenY());
+        });
+    }
+
+    private static void pasteFromClipboard(Canvas prevCanvas, double x, double y) {
+        if (internalClipboard == null) {return;}
+
+        isPastingMode = true;
+        hasSelection = false;
+        pasteX = x;
+        pasteY = y;
+
+        GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
+        pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+        pgc.drawImage(internalClipboard, pasteX, pasteY);
+
+        //Border Guide
+        pgc.setStroke(Color.GRAY);
+        pgc.setLineWidth(1.0);
+        pgc.setLineDashes(2.0);
+        pgc.strokeRect(pasteX, pasteY, internalClipboard.getWidth(), internalClipboard.getHeight());
+
+        //Transfer Variables
+        selectionSnapshot = internalClipboard;
+        selectX = pasteX;
+        selectY = pasteY;
+        selectW = internalClipboard.getWidth();
+        selectH = internalClipboard.getHeight();
     }
 
     //Commit Paste

@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,12 +40,12 @@ public class TabFeature {
 
         canvasContainer.getChildren().addAll(mainCanvas,prevCanvas);
 
-        gc.setFill(javafx.scene.paint.Color.WHITE);
-        gc.fillRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
         //Image and Canvas Stack
         StackPane combineArea = new StackPane(imageView, canvasContainer);
-
         ScrollPane imagePane = new ScrollPane(combineArea);
+
+        gc.setFill(Color.web("#F0F4F2"));
+        gc.fillRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
 
         //Autosaving
         Timeline tabTimeline = AutosaveFeature.startAutosaveTimer(mainCanvas, 60);
@@ -52,7 +53,7 @@ public class TabFeature {
         imagePane.setPannable(false);
         imagePane.setFitToWidth(true);
         imagePane.setFitToHeight(true);
-        imagePane.setStyle("-fx-background: #2b2b2b;");
+        imagePane.setStyle("-fx-background: #202030;");
         imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 

@@ -143,6 +143,7 @@ public class SideMenuHandles {
             toolToggle.selectToggle(null);
         });
     }
+
     //Clear Canvas
     static void clearCanvas(TabFeature.TabRecord context, ActionEvent event) {
         Alert clearAlert = new Alert(Alert.AlertType.CONFIRMATION);

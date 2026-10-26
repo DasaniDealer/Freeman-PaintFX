@@ -1,5 +1,6 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -80,6 +81,13 @@ public class SideMenuSettings {
         Spinner<Integer> starSpinner = new Spinner<>(3, 20, 5);
         starSpinner.setEditable(true);
 
+        //Rotate & Flip Buttons
+        Button rotate90Button = new Button("90°");
+        Button rotate180Button = new Button("180°");
+        Button rotate270Button = new Button("270°");
+
+        Button horiFlipButton = new Button("", new FontIcon(FontAwesomeSolid.EXCHANGE_ALT));
+        Button vertFlipButton = new Button("", new FontIcon(FontAwesomeSolid.SORT));
 
         //Menu Groups
         MenuButton lineMenu = new MenuButton("╱");
@@ -110,28 +118,36 @@ public class SideMenuSettings {
 
         //HBox Settings
         HBox undoRedoBox = new HBox(10);
-        undoRedoBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        undoRedoBox.setAlignment(Pos.CENTER_LEFT);
         undoRedoBox.getChildren().addAll(undoButton, redoButton);
 
         HBox drawBox = new HBox(10);
-        drawBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        drawBox.setAlignment(Pos.CENTER_LEFT);
         drawBox.getChildren().addAll(pencilButton, lineMenu, eraserButton);
 
         HBox extraBox = new HBox(10);
-        extraBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        extraBox.setAlignment(Pos.CENTER_LEFT);
         extraBox.getChildren().addAll(textButton, selectButton, clearButton);
 
-        HBox shapeBox = new HBox(10);
-        shapeBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        HBox shapeBox = new HBox(5);
+        shapeBox.setAlignment(Pos.CENTER_LEFT);
         shapeBox.getChildren().addAll(shapeMenu, dashMenu, fillShapeMenu);
 
         HBox polygonBox = new HBox(10);
-        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        polygonBox.setAlignment(Pos.CENTER_LEFT);
         polygonBox.getChildren().addAll(polygonSpinner, polygonMenu);
 
         HBox starBox = new HBox(10);
-        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        polygonBox.setAlignment(Pos.CENTER_LEFT);
         starBox.getChildren().addAll(starSpinner, starMenu);
+
+        HBox rotateBox = new HBox(10);
+        rotateBox.setAlignment(Pos.CENTER_LEFT);
+        rotateBox.getChildren().addAll(rotate90Button, rotate180Button, rotate270Button);
+
+        HBox flipBox = new HBox(10);
+        flipBox.setAlignment(Pos.CENTER_LEFT);
+        flipBox.getChildren().addAll(horiFlipButton, vertFlipButton);
 
         //Clear New Tab Listeners
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
@@ -151,7 +167,8 @@ public class SideMenuSettings {
         //Side Menu Placements
         sideMenu.getChildren().addAll(
                 toolsLabel, undoRedoBox, drawBox, extraBox,
-                shapeBox, polygonBox, starBox, drawSettings
+                shapeBox, polygonBox, starBox,
+                rotateBox, flipBox, drawSettings
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);
@@ -214,29 +231,6 @@ public class SideMenuSettings {
                 }
 
                 isSaved = false;
-            }
-        });
-
-        //Undo Redo Button
-        undoButton.setOnAction(event -> {
-            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
-            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                CanvasHistory.undo(context.mainCanvas());
-            }
-        });
-        redoButton.setOnAction(event -> {
-            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
-            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                CanvasHistory.redo(context.mainCanvas());
-            }
-        });
-
-        //Clear Button
-        clearButton.setOnAction(event -> {
-            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
-            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                MiscHandles.clearListeners(context);
-                SideMenuHandles.clearCanvas(context, event);
             }
         });
 
@@ -322,6 +316,63 @@ public class SideMenuSettings {
                             false, true);
                 }
                 isSaved = false;
+            }
+        });
+
+        //Undo Redo Button
+        undoButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                CanvasHistory.undo(context.mainCanvas());
+            }
+        });
+        redoButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                CanvasHistory.redo(context.mainCanvas());
+            }
+        });
+
+        //Clear Button
+        clearButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                MiscHandles.clearListeners(context);
+                SideMenuHandles.clearCanvas(context, event);
+            }
+        });
+
+        //Rotate
+        rotate90Button.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                RotateHandles.handleRotate(context, 90);
+            }
+        });
+        rotate180Button.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                RotateHandles.handleRotate(context, 90);
+                RotateHandles.handleRotate(context, 90);
+            }
+        });
+        rotate270Button.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                RotateHandles.handleRotate(context, 270);
+            }
+        });
+        //Flip
+        horiFlipButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                RotateHandles.handleFlip(context, true, false);
+            }
+        });
+        vertFlipButton.setOnAction(event -> {
+            Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
+            if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
+                RotateHandles.handleFlip(context, false, true);
             }
         });
     }

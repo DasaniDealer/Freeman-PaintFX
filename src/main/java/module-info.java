@@ -9,9 +9,9 @@ module com.paintfx.freemanpaintfx {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
-    requires com.almasb.fxgl.all;
     requires javafx.swing;
     requires jdk.httpserver;
+    requires org.kordamp.ikonli.fontawesome5;
 
     opens com.paintfx.freemanpaintfx to javafx.fxml;
     exports com.paintfx.freemanpaintfx;

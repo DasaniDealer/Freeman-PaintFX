@@ -2,9 +2,12 @@ package com.paintfx.freemanpaintfx;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.robot.Robot;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class DrawSettings extends VBox {
 
@@ -26,7 +29,7 @@ public class DrawSettings extends VBox {
 
         //Colour Grabber
         colorGrab = new Robot();
-        grabberButton = new ToggleButton("Colour Grabber");
+        grabberButton = new ToggleButton("", new FontIcon(FontAwesomeSolid.EYE_DROPPER));
 
         //Brush Size
         Label sizeLabel = new Label("Brush Size");
@@ -35,9 +38,13 @@ public class DrawSettings extends VBox {
         sizeSlider = new Slider(0, 50, 5);
         sizeSlider.setShowTickLabels(true);
 
+        HBox colorBox = new HBox(10);
+        colorBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        colorBox.getChildren().addAll(colorPicker, grabberButton);
+
         this.getChildren().addAll(
-                colorLabel, colorPicker,
-                grabberButton,
+                colorLabel,
+                colorBox,
                 sizeLabel, sizeSlider
         );
     }

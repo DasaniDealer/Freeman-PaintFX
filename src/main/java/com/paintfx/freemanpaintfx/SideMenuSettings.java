@@ -3,6 +3,8 @@ package com.paintfx.freemanpaintfx;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class SideMenuSettings {
     private final VBox sideMenu;
@@ -24,20 +26,20 @@ public class SideMenuSettings {
         toolsLabel.setStyle("-fx-font-weight: bold;");
 
         //Undo Redo Buttons
-        Button undoButton = new Button("Undo");
-        Button redoButton = new Button("Redo");
+        Button undoButton = new Button("", new FontIcon(FontAwesomeSolid.UNDO));
+        Button redoButton = new Button("", new FontIcon(FontAwesomeSolid.REDO));
 
         undoButton.setOnAction(event -> triggerAction(tabPane, context -> CanvasHistory.undo(context.mainCanvas())));
         redoButton.setOnAction(event -> triggerAction(tabPane, context -> CanvasHistory.redo(context.mainCanvas())));
 
-        ToggleButton selectButton = new ToggleButton("Select");
-        ToggleButton pencilButton = new ToggleButton("Pencil");
-        ToggleButton eraserButton = new ToggleButton("Eraser");
-        ToggleButton textButton = new ToggleButton("Text");
+        ToggleButton selectButton = new ToggleButton("", new FontIcon(FontAwesomeSolid.VECTOR_SQUARE));
+        ToggleButton pencilButton = new ToggleButton("", new FontIcon(FontAwesomeSolid.PEN));
+        ToggleButton eraserButton = new ToggleButton("", new FontIcon(FontAwesomeSolid.ERASER));
+        ToggleButton textButton = new ToggleButton("", new FontIcon(FontAwesomeSolid.FONT));
         ToggleButton grabButton = drawSettings.getGrabButton();
-        Button clearButton = new Button("Clear Canvas");
+        Button clearButton = new Button("", new FontIcon(FontAwesomeSolid.TRASH_ALT));
 
-        RadioMenuItem lineButton = new RadioMenuItem("Line");
+        RadioMenuItem lineButton = new RadioMenuItem("Straight");
         RadioMenuItem dashButton = new RadioMenuItem("Dashed");
 
         RadioMenuItem squareButton = new RadioMenuItem("Square");
@@ -80,12 +82,12 @@ public class SideMenuSettings {
 
 
         //Menu Groups
-        MenuButton lineMenu = new MenuButton("Line");
-        MenuButton shapeMenu = new MenuButton("Shape");
-        MenuButton dashMenu = new MenuButton("Dashed Shape");
-        MenuButton fillShapeMenu = new MenuButton("Filled Shape");
-        MenuButton polygonMenu = new MenuButton("Polygon");
-        MenuButton starMenu = new MenuButton("Star");
+        MenuButton lineMenu = new MenuButton("╱");
+        MenuButton shapeMenu = new MenuButton("□");
+        MenuButton dashMenu = new MenuButton("⬚");
+        MenuButton fillShapeMenu = new MenuButton("■");
+        MenuButton polygonMenu = new MenuButton("", new FontIcon(FontAwesomeSolid.SHAPES));
+        MenuButton starMenu = new MenuButton("", new FontIcon(FontAwesomeSolid.STAR));
 
         //Toggle Groups
         ToggleGroup toolToggle = new ToggleGroup();
@@ -106,29 +108,30 @@ public class SideMenuSettings {
                 circleButton, dashCircleButton, fillCircleButton,
                 ellipseButton, dashEllipseButton, fillEllipseButton);
 
-        //Polygon HBox
-        HBox polygonBox = new HBox(5);
-        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-        polygonSpinner.setPrefWidth(75);
-        polygonMenu.setPrefWidth(110);
-
-        polygonBox.getChildren().addAll(polygonSpinner, polygonMenu);
-
-        //Polygon HBox
-        HBox starBox = new HBox(5);
-        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-        starSpinner.setPrefWidth(75);
-        starMenu.setPrefWidth(110);
-
-        starBox.getChildren().addAll(starSpinner, starMenu);
-
-        //Undo Redo HBox
+        //HBox Settings
         HBox undoRedoBox = new HBox(10);
         undoRedoBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
         undoRedoBox.getChildren().addAll(undoButton, redoButton);
+
+        HBox drawBox = new HBox(10);
+        drawBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        drawBox.getChildren().addAll(pencilButton, lineMenu, eraserButton);
+
+        HBox extraBox = new HBox(10);
+        extraBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        extraBox.getChildren().addAll(textButton, selectButton, clearButton);
+
+        HBox shapeBox = new HBox(10);
+        shapeBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        shapeBox.getChildren().addAll(shapeMenu, dashMenu, fillShapeMenu);
+
+        HBox polygonBox = new HBox(10);
+        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        polygonBox.getChildren().addAll(polygonSpinner, polygonMenu);
+
+        HBox starBox = new HBox(10);
+        polygonBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        starBox.getChildren().addAll(starSpinner, starMenu);
 
         //Clear New Tab Listeners
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
@@ -147,10 +150,8 @@ public class SideMenuSettings {
 
         //Side Menu Placements
         sideMenu.getChildren().addAll(
-                toolsLabel, undoRedoBox,
-                selectButton, pencilButton, eraserButton, textButton, clearButton,
-                lineMenu, shapeMenu, dashMenu, fillShapeMenu,
-                polygonBox, starBox, drawSettings
+                toolsLabel, undoRedoBox, drawBox, extraBox,
+                shapeBox, polygonBox, starBox, drawSettings
         );
 
         lineMenu.getItems().addAll(lineButton, dashButton);

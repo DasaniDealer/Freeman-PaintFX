@@ -19,6 +19,9 @@ public class TabFeature {
     public static final Map<String, Canvas> sharedCanvases = new HashMap<>();
     private static WebserverFeature serverInstance;
 
+    private static int boundWidth = 1150;
+    private static int boundHeight = 650;
+
     public static void addTab(TabPane tabPane) {
         tabCount++;
         String tabTitle = "Tab " + tabCount;
@@ -32,10 +35,10 @@ public class TabFeature {
         Group canvasContainer = new Group();
 
         //Find Monitor Bounds
-        Canvas mainCanvas = new Canvas(1150, 650);
+        Canvas mainCanvas = new Canvas(boundWidth, boundHeight);
         GraphicsContext gc = mainCanvas.getGraphicsContext2D();
 
-        Canvas prevCanvas = new Canvas(1150, 650);
+        Canvas prevCanvas = new Canvas(boundWidth, boundHeight);
         GraphicsContext pgc = prevCanvas.getGraphicsContext2D();
 
         canvasContainer.getChildren().addAll(mainCanvas,prevCanvas);
@@ -44,7 +47,7 @@ public class TabFeature {
         StackPane combineArea = new StackPane(imageView, canvasContainer);
         ScrollPane imagePane = new ScrollPane(combineArea);
 
-        gc.setFill(Color.web("#F0F4F2"));
+        gc.setFill(Color.TRANSPARENT);
         gc.fillRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
 
         //Autosaving
@@ -53,7 +56,6 @@ public class TabFeature {
         imagePane.setPannable(false);
         imagePane.setFitToWidth(true);
         imagePane.setFitToHeight(true);
-        imagePane.setStyle("-fx-background: #202030;");
         imagePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         imagePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 

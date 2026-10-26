@@ -1,16 +1,11 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.geometry.Rectangle2D;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-
-import static com.paintfx.freemanpaintfx.SideMenuHandles.isDrawing;
 
 public class SelectSettings {
     private static double startX, startY;

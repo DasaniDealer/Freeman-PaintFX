@@ -9,7 +9,7 @@ import javafx.scene.paint.Color;
 
 import static com.paintfx.freemanpaintfx.SelectSettings.*;
 
-public class RotateHandles {
+public class RotateFeatures {
     //Handle Rotate
     public static void handleRotate(TabFeature.TabRecord record, double degrees) {
         Canvas mainCanvas = record.mainCanvas();

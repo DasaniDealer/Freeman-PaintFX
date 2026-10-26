@@ -52,7 +52,7 @@ public class MenuSettings extends MenuBar {
         openImage.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                MenuHandles.handleOpen(tabPane, primaryStage);
+                MenuFeatures.handleOpen(tabPane, primaryStage);
             }
         });
         openImage.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
@@ -65,8 +65,8 @@ public class MenuSettings extends MenuBar {
 
                 if (currentCanvas != null) {
                     WritableImage canvasImage = currentCanvas.snapshot(null, null);
-                    MenuHandles.handleSave(canvasImage, primaryStage);
-                    PaintApplication.isSaved = true; // Note: Handled inside MenuHandles, but safe to keep
+                    MenuFeatures.handleSave(canvasImage, primaryStage);
+                    PaintApplication.isSaved = true; // Note: Handled inside MenuFeatures, but safe to keep
                 }
             }
         });
@@ -80,8 +80,8 @@ public class MenuSettings extends MenuBar {
 
                 if (currentCanvas != null) {
                     WritableImage canvasImage = currentCanvas.snapshot(null, null);
-                    MenuHandles.handleSaveAs(canvasImage, primaryStage);
-                    PaintApplication.isSaved = true; // Note: Handled inside MenuHandles, but safe to keep
+                    MenuFeatures.handleSaveAs(canvasImage, primaryStage);
+                    PaintApplication.isSaved = true; // Note: Handled inside MenuFeatures, but safe to keep
                 }
             }
         });
@@ -147,7 +147,7 @@ public class MenuSettings extends MenuBar {
         helpAct.setOnAction(event -> {
             Popup helpPopup = new Popup();
 
-            MenuHandles.handleHelp(helpPopup, primaryStage);
+            MenuFeatures.handleHelp(helpPopup, primaryStage);
         });
 
         //Close Intercept
@@ -156,7 +156,7 @@ public class MenuSettings extends MenuBar {
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
                 WritableImage combineImage = context.combineArea().snapshot(null, null);
 
-                MenuHandles.handleExit(event, combineImage);
+                MenuFeatures.handleExit(event, combineImage);
             }
         });
     }

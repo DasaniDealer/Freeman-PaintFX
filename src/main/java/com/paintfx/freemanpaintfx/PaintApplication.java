@@ -49,7 +49,6 @@ public class PaintApplication extends Application {
 
         //SHOWTIME
         Scene scene = new Scene(root, 1150, 650);
-
         primaryStage.setScene(scene);
         primaryStage.show();
     }

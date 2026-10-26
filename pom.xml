@@ -19,6 +19,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.controlsfx</groupId>
+        <artifactId>controlsfx</artifactId>
+        <version>21.0.2</version>
+      </dependency>
+      <dependency>
         <groupId>org.kordamp.ikonli</groupId>
         <artifactId>ikonli-bom</artifactId>
         <version>${ikonli.version}</version>

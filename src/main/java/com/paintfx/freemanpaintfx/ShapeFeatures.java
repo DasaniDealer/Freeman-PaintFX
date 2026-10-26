@@ -2,10 +2,8 @@ package com.paintfx.freemanpaintfx;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 
-public class ShapeHandles {
+public class ShapeFeatures {
     private static double startX;
     private static double startY;
 
@@ -29,7 +27,7 @@ public class ShapeHandles {
             width = Math.abs(startX - event.getX());
             height = Math.abs(startY - event.getY());
 
-            MiscHandles.applySettings(pgc, drawSettings, dashed);
+            MiscFeatures.applySettings(pgc, drawSettings, dashed);
             if (filled) {pgc.fillRect(x, y, width, height);}
 
             pgc.strokeRect(x, y, width, height);
@@ -44,7 +42,7 @@ public class ShapeHandles {
             width = Math.abs(startX - event.getX());
             height = Math.abs(startY - event.getY());
 
-            MiscHandles.applySettings(gc, drawSettings, dashed);
+            MiscFeatures.applySettings(gc, drawSettings, dashed);
             if (filled) {gc.fillRect(x, y, width, height);}
 
             gc.strokeRect(x, y, width, height);
@@ -63,14 +61,14 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseDragged(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(pgc, drawSettings, dashed);
-            MiscHandles.polygonRender(pgc, startX, startY, event.getX(), event.getY(), sides, filled);
+            MiscFeatures.applySettings(pgc, drawSettings, dashed);
+            MiscFeatures.polygonRender(pgc, startX, startY, event.getX(), event.getY(), sides, filled);
         });
 
         prevCanvas.setOnMouseReleased(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(gc, drawSettings, dashed);
-            MiscHandles.polygonRender(gc, startX, startY, event.getX(), event.getY(), sides, filled);
+            MiscFeatures.applySettings(gc, drawSettings, dashed);
+            MiscFeatures.polygonRender(gc, startX, startY, event.getX(), event.getY(), sides, filled);
         });
     }
     //Circle Function
@@ -86,7 +84,7 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseDragged(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(pgc, drawSettings, dashed);
+            MiscFeatures.applySettings(pgc, drawSettings, dashed);
 
             double radius = Math.hypot(event.getX() - startX, event.getY() - startY);
             double x = startX - radius;
@@ -99,7 +97,7 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseReleased(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(gc, drawSettings, dashed);
+            MiscFeatures.applySettings(gc, drawSettings, dashed);
 
             double radius = Math.hypot(event.getX() - startX, event.getY() - startY);
             double x = startX - radius;
@@ -123,7 +121,7 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseDragged(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(pgc, drawSettings, dashed);
+            MiscFeatures.applySettings(pgc, drawSettings, dashed);
 
             double x = Math.min(startX, event.getX());
             double y = Math.min(startY, event.getY());
@@ -136,7 +134,7 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseReleased(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(gc, drawSettings, dashed);
+            MiscFeatures.applySettings(gc, drawSettings, dashed);
 
             double x = Math.min(startX, event.getX());
             double y = Math.min(startY, event.getY());
@@ -160,7 +158,7 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseDragged(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(pgc, drawSettings, dashed);
+            MiscFeatures.applySettings(pgc, drawSettings, dashed);
 
             double[] xPoints = {startX, startX, event.getX()};
             double[] yPoints = {startY, event.getY(), event.getY()};
@@ -171,7 +169,7 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseReleased(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(gc, drawSettings, dashed);
+            MiscFeatures.applySettings(gc, drawSettings, dashed);
 
             double[] xPoints = {startX, startX, event.getX()};
             double[] yPoints = {startY, event.getY(), event.getY()};
@@ -192,24 +190,24 @@ public class ShapeHandles {
 
         prevCanvas.setOnMouseDragged(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(pgc, drawSettings, dashed);
+            MiscFeatures.applySettings(pgc, drawSettings, dashed);
 
             // Calculate outer radius based on mouse drag distance
             double rOuter = Math.hypot(event.getX() - startX, event.getY() - startY);
             // The inner radius looks best at roughly 40% to 50% of the outer radius
             double rInner = rOuter * 0.45;
 
-            MiscHandles.starRender(pgc, startX, startY, points, rOuter, rInner, filled);
+            MiscFeatures.starRender(pgc, startX, startY, points, rOuter, rInner, filled);
         });
 
         prevCanvas.setOnMouseReleased(event -> {
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            MiscHandles.applySettings(gc, drawSettings, dashed);
+            MiscFeatures.applySettings(gc, drawSettings, dashed);
 
             double rOuter = Math.hypot(event.getX() - startX, event.getY() - startY);
             double rInner = rOuter * 0.45;
 
-            MiscHandles.starRender(gc, startX, startY, points, rOuter, rInner, filled);
+            MiscFeatures.starRender(gc, startX, startY, points, rOuter, rInner, filled);
         });
     }
 }

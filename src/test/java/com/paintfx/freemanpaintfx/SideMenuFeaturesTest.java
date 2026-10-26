@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.CountDownLatch;
 
 
-public class SideMenuHandlesTest {
+public class SideMenuFeaturesTest {
 
     //Starts Environment
     @BeforeAll
@@ -40,7 +40,7 @@ public class SideMenuHandlesTest {
                 System.out.println("--- START COLOR GRAB TEST ---");
                 System.out.println("Initial Color Picker value: " + colorPicker.getValue());
 
-                SideMenuHandles.grabColor(canvas, drawSettings, toolToggle);
+                SideMenuFeatures.grabColor(canvas, drawSettings, toolToggle);
 
                 // Construct Fake Click
                 MouseEvent fakeClick = new MouseEvent(

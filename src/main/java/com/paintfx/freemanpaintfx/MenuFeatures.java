@@ -2,14 +2,9 @@ package com.paintfx.freemanpaintfx;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 
@@ -18,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-public class MenuHandles {
+public class MenuFeatures {
     private static File currentFile = null;
 
     //Open Function

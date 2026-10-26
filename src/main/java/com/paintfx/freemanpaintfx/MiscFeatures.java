@@ -1,11 +1,10 @@
 package com.paintfx.freemanpaintfx;
 
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.scene.shape.StrokeLineJoin;
 
-public class MiscHandles {
+public class MiscFeatures {
     //Apply Brush Settings
     static void applySettings(GraphicsContext gc, DrawSettings drawSettings, boolean dashed) {
         gc.setStroke(drawSettings.getColor());

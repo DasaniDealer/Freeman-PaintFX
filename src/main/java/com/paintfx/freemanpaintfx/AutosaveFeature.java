@@ -50,6 +50,7 @@ public class AutosaveFeature {
             });
         }
 
+        PaintLogger.getInstance().logHandle("AutosaveFeature","Autosave Started");
         return autosaveTimeline;
     }
 
@@ -83,6 +84,7 @@ public class AutosaveFeature {
         if (autosaveTimeline != null) {
             autosaveTimeline.stop();
             autosaveTimeline = null;
+            PaintLogger.getInstance().logHandle("AutosaveFeature","Autosave Stopped");
         }
     }
 
@@ -137,6 +139,7 @@ public class AutosaveFeature {
         fade.setDelay(Duration.seconds(2.0));
         fade.setOnFinished(e -> toastStage.close());
 
+        PaintLogger.getInstance().logHandle("AutosaveFeature","Autosave Notification");
         toastStage.show();
         fade.play();
     }

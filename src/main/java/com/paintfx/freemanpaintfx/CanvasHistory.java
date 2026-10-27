@@ -43,6 +43,7 @@ public class CanvasHistory {
         mainCanvas.snapshot(params, currentSnapshot);
         redoStack.push(currentSnapshot);
 
+        PaintLogger.getInstance().logHandle("CanvasHistory","Canvas Undo");
         WritableImage previousState = undoStack.pop();
         restoreCanvas(mainCanvas, previousState);
     }
@@ -58,6 +59,7 @@ public class CanvasHistory {
         mainCanvas.snapshot(params, currentSnapshot);
         undoStack.push(currentSnapshot);
 
+        PaintLogger.getInstance().logHandle("CanvasHistory","Canvas Redo");
         WritableImage nextState = redoStack.pop();
         restoreCanvas(mainCanvas, nextState);
     }
@@ -70,5 +72,6 @@ public class CanvasHistory {
     public static void clearHistory() {
         undoStack.clear();
         redoStack.clear();
+        PaintLogger.getInstance().logHandle("CanvasHistory","History Cleared");
     }
 }

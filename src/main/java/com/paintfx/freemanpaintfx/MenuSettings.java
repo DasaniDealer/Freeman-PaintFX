@@ -53,6 +53,7 @@ public class MenuSettings extends MenuBar {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
                 MenuFeatures.handleOpen(tabPane, primaryStage);
+                PaintLogger.getInstance().logHandle("MenuSettings","Open Image");
             }
         });
         openImage.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN));
@@ -62,11 +63,11 @@ public class MenuSettings extends MenuBar {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
                 Canvas currentCanvas = context.mainCanvas();
-
                 if (currentCanvas != null) {
                     WritableImage canvasImage = currentCanvas.snapshot(null, null);
                     MenuFeatures.handleSave(canvasImage, primaryStage);
-                    PaintApplication.isSaved = true; // Note: Handled inside MenuFeatures, but safe to keep
+                    PaintLogger.getInstance().logHandle("MenuSettings","Save Image");
+                    PaintApplication.isSaved = true;
                 }
             }
         });
@@ -81,7 +82,8 @@ public class MenuSettings extends MenuBar {
                 if (currentCanvas != null) {
                     WritableImage canvasImage = currentCanvas.snapshot(null, null);
                     MenuFeatures.handleSaveAs(canvasImage, primaryStage);
-                    PaintApplication.isSaved = true; // Note: Handled inside MenuFeatures, but safe to keep
+                    PaintLogger.getInstance().logHandle("MenuSettings","Save As Image");
+                    PaintApplication.isSaved = true;
                 }
             }
         });
@@ -109,6 +111,7 @@ public class MenuSettings extends MenuBar {
 
                 if (shareImage.isSelected()) {
                     TabFeature.sharedCanvases.put(tabTitle, context.mainCanvas());
+                    PaintLogger.getInstance().logHandle("MenuSettings","Webserver Image Shared");
                 } else {
                     TabFeature.sharedCanvases.remove(tabTitle);
                 }
@@ -141,6 +144,7 @@ public class MenuSettings extends MenuBar {
         //Tab Features
         addTab.setOnAction(event -> {
             TabFeature.addTab(tabPane);
+            PaintLogger.getInstance().logHandle("MenuSettings","Tab Added");
         });
 
         //Help Popup
@@ -148,6 +152,7 @@ public class MenuSettings extends MenuBar {
             Popup helpPopup = new Popup();
 
             MenuFeatures.handleHelp(helpPopup, primaryStage);
+            PaintLogger.getInstance().logHandle("MenuSettings","Help Selected");
         });
 
         //Close Intercept

@@ -160,6 +160,7 @@ public class SelectSettings {
                 selectionSnapshot = null;
                 pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                 activeMenu = null;
+                PaintLogger.getInstance().logHandle("SelectSettings","Image Cut");
             });
 
             copyItem.setOnAction(e -> {
@@ -171,11 +172,13 @@ public class SelectSettings {
                 pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
                 selectionSnapshot = null;
                 activeMenu = null;
+                PaintLogger.getInstance().logHandle("SelectSettings","Image Copied");
             });
 
             pasteItem.setOnAction(e -> {
                 pasteFromClipboard(prevCanvas,  Math.round(menuEvent.getX()), Math.round(menuEvent.getY()));
                 activeMenu = null;
+                PaintLogger.getInstance().logHandle("SelectSettings","Image Pasted");
             });
 
             cancelItem.setOnAction(e -> {

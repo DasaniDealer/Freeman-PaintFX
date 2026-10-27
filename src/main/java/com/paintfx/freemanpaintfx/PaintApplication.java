@@ -45,6 +45,9 @@ public class PaintApplication extends Application {
             e.printStackTrace();
         }
 
+        //Log Add
+        PaintLogger.getInstance().logHandle("System","Application Opened");
+
         MenuSettings.setServerInstance(webserver);
 
         //SHOWTIME
@@ -54,6 +57,9 @@ public class PaintApplication extends Application {
     }
 
     public void stop() {
+        PaintLogger.getInstance().logHandle("System","Application Closed");
+        PaintLogger.getInstance().shutdown();
+
         //Clean up the timer when the application closes
         if (AutosaveFeature.autosaveTimeline != null) {
             AutosaveFeature.stopAutosave();

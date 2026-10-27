@@ -1,5 +1,7 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.geometry.Rectangle2D;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
@@ -69,23 +71,19 @@ public class SelectSettings {
                 pgc.setLineWidth(1);
                 pgc.setLineDashes(5.0);
 
-                double x = Math.min(startX, event.getX());
-                double y = Math.min(startY, event.getY());
-                double width = Math.abs(startX - event.getX());
-                double height = Math.abs(startY - event.getY());
+                double x = Math.floor(Math.min(startX, event.getX()));
+                double y = Math.floor(Math.min(startY, event.getY()));
+                double width = Math.floor(Math.abs(startX - event.getX()));
+                double height = Math.floor(Math.abs(startY - event.getY()));
 
                 pgc.strokeRect(x, y, width, height);
 
-                selectX = x;
-                selectY = y;
-                selectW = width;
-                selectH = height;
             } else if (isDraggingSelection && selectionSnapshot != null) {
                 double dx = event.getX() - dragX;
                 double dy = event.getY() - dragY;
 
-                selectX += dx;
-                selectY += dy;
+                selectX = Math.round(selectX + dx);
+                selectY = Math.round(selectY + dy);
 
                 dragX = event.getX();
                 dragY = event.getY();
@@ -104,16 +102,16 @@ public class SelectSettings {
                 endX = event.getX();
                 endY = event.getY();
 
-                selectX = Math.min(startX, endX);
-                selectY = Math.min(startY, endY);
-                selectW = Math.abs(startX - endX);
-                selectH = Math.abs(startY - endY);
+                selectX = Math.floor(Math.min(startX, endX));
+                selectY = Math.floor(Math.min(startY, endY));
+                selectW = Math.floor(Math.abs(startX - endX));
+                selectH = Math.floor(Math.abs(startY - endY));
 
                 if (selectW > 1 && selectH > 1) {
                     //Snapshot Params
-                    javafx.scene.SnapshotParameters params = new javafx.scene.SnapshotParameters();
+                    SnapshotParameters params = new SnapshotParameters();
                     params.setFill(Color.TRANSPARENT);
-                    javafx.geometry.Rectangle2D rect = new javafx.geometry.Rectangle2D(selectX, selectY, selectW, selectH);
+                    Rectangle2D rect = new Rectangle2D(selectX, selectY, selectW, selectH);
                     params.setViewport(rect);
 
                     CanvasHistory.saveState(mainCanvas);
@@ -176,7 +174,7 @@ public class SelectSettings {
             });
 
             pasteItem.setOnAction(e -> {
-                pasteFromClipboard(prevCanvas, selectX, selectY);
+                pasteFromClipboard(prevCanvas,  Math.round(menuEvent.getX()), Math.round(menuEvent.getY()));
                 activeMenu = null;
             });
 
@@ -214,10 +212,10 @@ public class SelectSettings {
 
         //Transfer Variables
         selectionSnapshot = internalClipboard;
-        selectX = pasteX;
-        selectY = pasteY;
-        selectW = internalClipboard.getWidth();
-        selectH = internalClipboard.getHeight();
+        selectX = Math.round(pasteX);
+        selectY = Math.round(pasteY);
+        selectW = Math.round(internalClipboard.getWidth());
+        selectH = Math.round(internalClipboard.getHeight());
     }
 
     //Commit Paste

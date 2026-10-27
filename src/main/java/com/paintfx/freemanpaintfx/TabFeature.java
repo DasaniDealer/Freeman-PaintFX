@@ -19,8 +19,8 @@ public class TabFeature {
     public static final Map<String, Canvas> sharedCanvases = new HashMap<>();
     private static WebserverFeature serverInstance;
 
-    private static int boundWidth = 1150;
-    private static int boundHeight = 650;
+    private final static int boundWidth = 1150;
+    private final static int boundHeight = 650;
 
     public static void addTab(TabPane tabPane) {
         tabCount++;

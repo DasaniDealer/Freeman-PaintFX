@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 
 
 public class MenuSettings extends MenuBar {
-    private final int currentSeconds = 60;
+    public static final int currentSeconds = 60;
 
     private static WebserverFeature serverInstance;
 

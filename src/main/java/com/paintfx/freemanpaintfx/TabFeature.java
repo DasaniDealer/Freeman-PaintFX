@@ -6,7 +6,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
@@ -15,6 +14,9 @@ import java.util.Map;
 
 public class TabFeature {
     private static int tabCount = 0;
+    private static Timeline tabTimeline;
+
+    public static boolean enableAutosave = false;
 
     public static final Map<String, Canvas> sharedCanvases = new HashMap<>();
     private static WebserverFeature serverInstance;
@@ -51,7 +53,9 @@ public class TabFeature {
         gc.fillRect(0, 0, mainCanvas.getWidth(), mainCanvas.getHeight());
 
         //Autosaving
-        Timeline tabTimeline = AutosaveFeature.startAutosaveTimer(mainCanvas, 60);
+        if (enableAutosave) {
+            AutosaveFeature.startAutosaveTimer(mainCanvas, MenuSettings.currentSeconds);
+        }
 
         imagePane.setPannable(false);
         imagePane.setFitToWidth(true);
@@ -61,9 +65,9 @@ public class TabFeature {
 
         //Remove From Webserver
         newTab.setOnClosed(event -> {
-            if (tabTimeline != null) {
-                tabTimeline.stop();
-                System.out.println("Autosave stopped for: " + tabTitle);
+            if (AutosaveFeature.autosaveTimeline != null) {
+                AutosaveFeature.stopAutosave();
+                System.out.println("Autosave stopped via tab closure: " + tabTitle);
             }
 
             sharedCanvases.remove(tabTitle);

@@ -1,16 +1,36 @@
 package com.paintfx.freemanpaintfx;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
 import static com.paintfx.freemanpaintfx.SelectSettings.*;
 
 public class RotateFeatures {
-    //Handle Rotate
+    private static WritableImage transparentSnapshot(Canvas canvas) {
+        int w = (int) Math.round(canvas.getWidth());
+        int h = (int) Math.round(canvas.getHeight());
+
+        WritableImage target = new WritableImage(w, h);
+        SnapshotParameters params = new SnapshotParameters();
+        params.setFill(Color.TRANSPARENT);
+        params.setViewport(new Rectangle2D(0, 0, w, h));
+
+        return canvas.snapshot(params, target);
+    }
+
+    private static boolean isDimensionSwapNeeded(double degrees) {
+        int norm = (((int) Math.round(degrees) % 360) + 360) % 360;
+        return norm == 90 || norm == 270;
+    }
+
+    // Handle Rotate
     public static void handleRotate(TabFeature.TabRecord record, double degrees) {
         Canvas mainCanvas = record.mainCanvas();
         Canvas prevCanvas = record.prevCanvas();
@@ -20,23 +40,27 @@ public class RotateFeatures {
         if (selectionSnapshot != null) {
             selectionSnapshot = snapRotate(selectionSnapshot, degrees);
 
-            double currentCenterX = selectX + (selectW / 2.0);
-            double currentCenterY = selectY + (selectH / 2.0);
+            // Only swap width/height for 90 and 270 degrees (not 180)
+            if (isDimensionSwapNeeded(degrees)) {
+                double currentCenterX = selectX + (selectW / 2.0);
+                double currentCenterY = selectY + (selectH / 2.0);
 
-            double tempW = selectW;
-            selectW = selectH;
-            selectH = tempW;
+                double tempW = selectW;
+                selectW = selectH;
+                selectH = tempW;
 
-            selectX = currentCenterX - (selectW / 2.0);
-            selectY = currentCenterY - (selectH / 2.0);
+                selectX = Math.round(currentCenterX - (selectW / 2.0));
+                selectY = Math.round(currentCenterY - (selectH / 2.0));
+            }
 
+            pgc.setImageSmoothing(false);
             pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
-            pgc.drawImage(selectionSnapshot, selectX, selectY);
+            pgc.drawImage(selectionSnapshot, Math.round(selectX), Math.round(selectY));
 
             pgc.setStroke(Color.BLUE);
             pgc.setLineWidth(1);
             pgc.setLineDashes(5.0);
-            pgc.strokeRect(selectX, selectY, selectW, selectH);
+            pgc.strokeRect(Math.round(selectX), Math.round(selectY), selectW, selectH);
         } else {
             CanvasHistory.saveState(mainCanvas);
 
@@ -45,138 +69,102 @@ public class RotateFeatures {
         }
     }
 
-    //Rotate 90/180/270 Degrees
+    // Rotate 90/180/270 Degrees (Lossless Pixel-by-Pixel)
     static void fullRotate(Canvas canvas, GraphicsContext gc, double degrees) {
-        double oldW = canvas.getWidth();
-        double oldH = canvas.getHeight();
-        double newCenterX = oldH / 2.0;
-        double newCenterY = oldW / 2.0;
-        double drawX = newCenterX - (oldW/ 2.0);
-        double drawY = newCenterY - (oldH / 2.0);
+        WritableImage snapshot = transparentSnapshot(canvas);
+        WritableImage rotated = snapRotate(snapshot, degrees);
 
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
-        WritableImage snapshot = canvas.snapshot(params,null);
-
-        gc.clearRect(0,0,oldW,oldH);
-        canvas.setWidth(oldH);
-        canvas.setHeight(oldW);
-
-        gc.save();
-        gc.translate(newCenterX, newCenterY);
-        gc.rotate(degrees);
-        gc.translate(-newCenterX, -newCenterY);
-
-        gc.drawImage(snapshot, drawX, drawY);
-        gc.restore();
+        gc.setImageSmoothing(false);
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        canvas.setWidth(rotated.getWidth());
+        canvas.setHeight(rotated.getHeight());
+        gc.drawImage(rotated, 0, 0);
     }
 
-    //Rotate Section
+    // Rotate Section (Lossless Pixel-by-Pixel)
     private static WritableImage snapRotate(Image original, double degrees) {
         if (original == null) return null;
 
-        double newWidth = original.getHeight();
-        double newHeight = original.getWidth();
+        int w = (int) Math.round(original.getWidth());
+        int h = (int) Math.round(original.getHeight());
+        int norm = (((int) Math.round(degrees) % 360) + 360) % 360;
 
-        Canvas scratchCanvas = new Canvas(newWidth, newHeight);
-        GraphicsContext sgc = scratchCanvas.getGraphicsContext2D();
-        sgc.setImageSmoothing(false);
+        PixelReader reader = original.getPixelReader();
+        WritableImage dest = (norm == 90 || norm == 270)
+                ? new WritableImage(h, w)
+                : new WritableImage(w, h);
+        PixelWriter writer = dest.getPixelWriter();
 
-        double centerX = newWidth / 2.0;
-        double centerY = newHeight / 2.0;
-
-        sgc.save();
-        sgc.translate(centerX, centerY);
-        sgc.rotate(degrees);
-        sgc.translate(-centerX, -centerY);
-
-        double drawX = centerX - (original.getWidth() / 2.0);
-        double drawY = centerY - (original.getHeight() / 2.0);
-        sgc.drawImage(original, drawX, drawY);
-        sgc.restore();
-
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
-        return scratchCanvas.snapshot(params, null);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int argb = reader.getArgb(x, y);
+                if (norm == 90) {
+                    writer.setArgb(h - 1 - y, x, argb);
+                } else if (norm == 180) {
+                    writer.setArgb(w - 1 - x, h - 1 - y, argb);
+                } else if (norm == 270) {
+                    writer.setArgb(y, w - 1 - x, argb);
+                } else {
+                    writer.setArgb(x, y, argb);
+                }
+            }
+        }
+        return dest;
     }
 
-    //Handle Flip
-    public static void handleFlip(TabFeature.TabRecord record,
-                                  boolean hori, boolean vert) {
+    // Handle Flip
+    public static void handleFlip(TabFeature.TabRecord record, boolean hori, boolean vert) {
         Canvas mainCanvas = record.mainCanvas();
         Canvas prevCanvas = record.prevCanvas();
         GraphicsContext gc = record.gc();
         GraphicsContext pgc = record.pgc();
-
         if (selectionSnapshot != null) {
             selectionSnapshot = snapFlip(selectionSnapshot, hori, vert);
 
-            pgc.clearRect(0,0,prevCanvas.getWidth(),prevCanvas.getHeight());
-            pgc.drawImage(selectionSnapshot, selectX, selectY);
+            pgc.setImageSmoothing(false);
+            pgc.clearRect(0, 0, prevCanvas.getWidth(), prevCanvas.getHeight());
+            pgc.drawImage(selectionSnapshot, Math.round(selectX), Math.round(selectY));
 
             pgc.setStroke(Color.BLUE);
             pgc.setLineWidth(1);
             pgc.setLineDashes(5.0);
-            pgc.strokeRect(selectX, selectY, selectW, selectH);
-        }
-        else {
+            pgc.strokeRect(Math.round(selectX), Math.round(selectY), selectW, selectH);
+        } else {
             CanvasHistory.saveState(mainCanvas);
+
             fullFlip(mainCanvas, gc, hori, vert);
             fullFlip(prevCanvas, pgc, hori, vert);
         }
     }
 
-    //Flip Full Canvas
-    private static void fullFlip(Canvas canvas, GraphicsContext gc,
-                                 boolean hori, boolean vert) {
-        double width = canvas.getWidth();
-        double height = canvas.getHeight();
+    // Flip Full Canvas (Lossless Pixel-by-Pixel)
+    private static void fullFlip(Canvas canvas, GraphicsContext gc, boolean hori, boolean vert) {
+        WritableImage snapshot = transparentSnapshot(canvas);
+        WritableImage flipped = snapFlip(snapshot, hori, vert);
 
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
-        WritableImage snapshot = canvas.snapshot(params, null);
-
-        gc.clearRect(0,0,width,height);
-        gc.save();
-
-        double scaleX = hori ? -1 : 1;
-        double scaleY = vert ? -1 : 1;
-        double translateX = hori ? width : 0;
-        double translateY = vert ? height : 0;
-
-        gc.translate(translateX, translateY);
-        gc.scale(scaleX, scaleY);
-        gc.drawImage(snapshot, 0, 0);
-        gc.restore();
+        gc.setImageSmoothing(false);
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.drawImage(flipped, 0, 0);
     }
 
-    //Flip Section
-    private static WritableImage snapFlip(Image original,
-                                          boolean hori, boolean vert) {
+    // Flip Section (Lossless Pixel-by-Pixel)
+    private static WritableImage snapFlip(Image original, boolean hori, boolean vert) {
         if (original == null) return null;
-        double width = original.getWidth();
-        double height = original.getHeight();
 
-        Canvas scratchCanvas = new Canvas(width, height);
-        GraphicsContext sgc = scratchCanvas.getGraphicsContext2D();
-        sgc.setImageSmoothing(false);
+        int w = (int) Math.round(original.getWidth());
+        int h = (int) Math.round(original.getHeight());
 
-        sgc.save();
-        double scaleX = hori ? -1 : 1;
-        double scaleY = vert ? -1 : 1;
-        double translateX = hori ? width : 0;
-        double translateY = vert ? height : 0;
+        PixelReader reader = original.getPixelReader();
+        WritableImage dest = new WritableImage(w, h);
+        PixelWriter writer = dest.getPixelWriter();
 
-        sgc.translate(translateX, translateY);
-        sgc.scale(scaleX, scaleY);
-
-        sgc.drawImage(original, 0, 0);
-        sgc.restore();
-
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);
-        return scratchCanvas.snapshot(params, null);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int destX = hori ? (w - 1 - x) : x;
+                int destY = vert ? (h - 1 - y) : y;
+                writer.setArgb(destX, destY, reader.getArgb(x, y));
+            }
+        }
+        return dest;
     }
 }
-
-

@@ -254,17 +254,14 @@ public class SideMenuHandles {
         rotate180Button.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                RotateFeatures.handleRotate(context, 90);
-                RotateFeatures.handleRotate(context, 90);
+                RotateFeatures.handleRotate(context, 180);
                 PaintLogger.getInstance().logHandle("SideMenuSettings","Rotated 180 Degrees");
             }
         });
         rotate270Button.setOnAction(event -> {
             Tab activeTab = tabPane.getSelectionModel().getSelectedItem();
             if (activeTab != null && activeTab.getUserData() instanceof TabFeature.TabRecord context) {
-                RotateFeatures.handleRotate(context, 90);
-                RotateFeatures.handleRotate(context, 90);
-                RotateFeatures.handleRotate(context, 90);
+                RotateFeatures.handleRotate(context, 270);
                 PaintLogger.getInstance().logHandle("SideMenuSettings","Rotated 270 Degrees");
             }
         });
